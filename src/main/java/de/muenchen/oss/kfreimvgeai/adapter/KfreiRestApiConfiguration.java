@@ -24,7 +24,6 @@ package de.muenchen.oss.kfreimvgeai.adapter;
 
 import de.muenchen.oss.kfreimvgeai.config.AppConfigurationProperties;
 import de.muenchen.oss.kfreimvgeai.config.KfreiRestApiType;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
@@ -95,7 +94,7 @@ public class KfreiRestApiConfiguration {
      * @param baseUrl                       the base URL for the KfreiRestApiService
      * @return the configured WebClient instance
      */
-    WebClient kfreiRestApiwebClient(@Qualifier("KfreiRestApiAuthorizedClientManager") OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager,
+    WebClient kfreiRestApiwebClient(OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager,
             String baseUrl) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 = new ServletOAuth2AuthorizedClientExchangeFilterFunction(oAuth2AuthorizedClientManager);
         oauth2.setDefaultClientRegistrationId("kfrei-rest-api");

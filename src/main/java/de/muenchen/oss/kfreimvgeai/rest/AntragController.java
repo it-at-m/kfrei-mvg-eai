@@ -28,6 +28,7 @@ import de.muenchen.oss.kfreimvgeai.mapper.DefaultMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -49,7 +50,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/antraege")
+@RequestMapping("/api/V1/antraege")
 @Tag(name = "Anträge", description = "Operations for Anträge")
 @RequiredArgsConstructor
 @Slf4j
@@ -67,11 +68,36 @@ public class AntragController {
     @ApiResponses(
             {
                     @ApiResponse(
-                            responseCode = "200", description = "Antrag exists", content = @Content(mediaType = "application/json"), useReturnTypeSchema = true
+                            responseCode = "200",
+                            description = "Antrag exists",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = MvgResponseDto.class)
+                            )
                     ),
-                    @ApiResponse(responseCode = "404", description = "Antrag does not exist"),
-                    @ApiResponse(responseCode = "500", description = "Processing error occurred"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized access"),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Bad Request",
+                            content = @Content(
+                                    mediaType = "text/plain",
+                                    schema = @Schema(type = "string")
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized access",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Antrag does not exist",
+                            content = @Content
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Processing error occurred",
+                            content = @Content
+                    )
             }
     )
     public Mono<ResponseEntity<MvgResponseDto>> existsAntrag(
@@ -97,14 +123,14 @@ public class AntragController {
                     return ResponseEntity.ok(mvgResponseDto);
                 })
                 .onErrorResume(WebClientResponseException.NotFound.class, ex -> {
-                    log.debug("Antrag not found [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
-                            antragId, geburtsdatum, originUserName, requestId);
+                            log.debug("Antrag not found [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                                    antragId, geburtsdatum, originUserName, requestId);
                             return Mono.just(ResponseEntity.notFound().build());
                         }
                 )
                 .onErrorResume(WebClientResponseException.class, ex -> {
-                    log.debug("Unknown error [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
-                            antragId, geburtsdatum, originUserName, requestId, ex);
+                            log.error("Unknown error [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                                    antragId, geburtsdatum, originUserName, requestId, ex);
                             return Mono.just(ResponseEntity.internalServerError().build());
                         }
                 );

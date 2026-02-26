@@ -45,13 +45,13 @@ public class KfreiRestApiService implements KfreiRestApiServiceI {
     public KfreiRestApiService(String baseUrl, WebClient webClient) {
         this.baseUrl = baseUrl;
         this.webClient = webClient;
-        log.debug("Created KfreiRestApiService [baseUrl={}]", this.baseUrl);
+        log.info("Created KfreiRestApiService [baseUrl={}]", this.baseUrl);
     }
 
     public Mono<KfreiResponseDto> existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) {
         String path = "/antraege/{antragId}/exists";
 
-        log.info("Requesting KfreiRestApi [baseUrl={}, path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+        log.debug("Requesting KfreiRestApi [baseUrl={}, path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
                 this.baseUrl, path, antragId, geburtsdatum, originUserName, requestId);
 
         return this.webClient.get()

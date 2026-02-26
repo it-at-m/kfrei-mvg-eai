@@ -1,5 +1,5 @@
 // antragId: 1111111111
 // geburtsdatum: d1989-05-30
 // note: Matching DTO in KfreiRestApiServiceMock results in a 200 OK response with the corresponding data.
-GET http://localhost:8081/api/antraege/1111111111/exists?geburtsdatum=1989-11-30
+GET http://localhost:8081/api/antraege/V1/1111111111/exists?geburtsdatum=1989-11-30
 Authorization: Bearer {{$auth.token("keycloak")}}

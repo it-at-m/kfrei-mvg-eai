@@ -42,13 +42,13 @@ public class KfreiRestApiServiceMock implements KfreiRestApiServiceI {
 
     public KfreiRestApiServiceMock(String baseUrl) {
         this.baseUrl = baseUrl;
-        log.debug("Created KfreiRestApiServiceMock [baseUrl={}]", this.baseUrl);
+        log.info("Created KfreiRestApiServiceMock [baseUrl={}]", this.baseUrl);
     }
 
     public Mono<KfreiResponseDto> existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) {
         String path = "/antraege/{antragId}/exists";
 
-        log.info("Requesting KfreiRestApiMock [baseUrl={}, path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+        log.debug("Requesting KfreiRestApiMock [baseUrl={}, path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
                 this.baseUrl, path, antragId, geburtsdatum, originUserName, requestId);
 
         if (antragId == 0L) {
