@@ -1,0 +1,54 @@
+spring:
+  profiles:
+    # Possible values are: logstash, no-security
+    active: logstash, no-security
+  application:
+    name: kfrei-mvg-eai
+security:
+  oauth2:
+    # OAuth2 configuration for accessing the kfrei-mvg-eai api
+    resourceserver:
+      jwt:
+        issuer-uri: ""
+    client:
+      provider:
+        # OAuth2 provider for accessing the kfrei-mvg-eai web application
+        kfrei-mvg-eai-web:
+          issuer-uri: ""
+          user-info-uri: ""
+          user-name-attribute: ""
+        # OAuth2 provider for accessing the KfreiRestApi
+        kfrei-rest-api:
+          issuer-uri: ""
+      registration:
+        # OAuth2 registration for accessing the kfrei-mvg-eai web application
+        kfrei-mvg-eai-web:
+          authorization-grant-type: ""
+          client-id: ""
+          client-name: ""
+          client-secret: ""
+          redirect-uri: ""
+          scope: ""
+          # OAuth2 registration for accessing the KfreiRestApi
+        kfrei-rest-api:
+          authorization-grant-type: ""
+          client-id: ""
+          client-name: ""
+          client-secret: ""
+          scope: ""
+server:
+  port: 8081
+  shutdown: graceful
+app:
+  kfrei-rest-api:
+    # Selection of the specific client implementation. Possible values are: mock, rest
+    type: mock
+    base-url: http://localhost:8080
+springdoc:
+  packages-to-scan: de.muenchen.oss.kfreimvgeai.rest
+  pathsToMatch: /api/V1/**
+logging:
+  level:
+    de.muenchen.oss: INFO
+    org.springframework: INFO
+    root: WARN

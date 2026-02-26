@@ -1,0 +1,3 @@
+${AnsiColor.BRIGHT_GREEN}
+starting de.muenchen.oss » kfreimvgeai
+${AnsiColor.DEFAULT}

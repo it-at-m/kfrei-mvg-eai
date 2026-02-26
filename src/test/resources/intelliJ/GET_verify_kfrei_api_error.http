@@ -1,0 +1,5 @@
+// antragId: 0, leads to error in KfreiRestApiServiceMock
+// geburtsdatum: don't care
+// note: AntragController responds with a 500 Internal Server Error.
+GET http://localhost:8081/api/antraege/0/exists?geburtsdatum=2024-02-29
+Authorization: Bearer {{$auth.token("keycloak")}}

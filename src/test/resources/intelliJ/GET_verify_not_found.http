@@ -1,0 +1,5 @@
+// antragId: 9999999999
+// geburtsdatum: 1989-05-30
+// note: No matching DTO in KfreiRestApiServiceMock results in a 404 Not Found response.
+GET http://localhost:8081/api/antraege/9999999999/exists?geburtsdatum=1989-05-30
+Authorization: Bearer {{$auth.token("keycloak")}}
