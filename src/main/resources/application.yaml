@@ -4,6 +4,10 @@ spring:
     active: logstash, no-security
   application:
     name: kfrei-mvg-eai
+  web:
+    error:
+      whitelabel:
+        enabled: false
 security:
   oauth2:
     # OAuth2 configuration for accessing the kfrei-mvg-eai api
@@ -25,7 +29,6 @@ security:
         kfrei-mvg-eai-web:
           authorization-grant-type: ""
           client-id: ""
-          client-name: ""
           client-secret: ""
           redirect-uri: ""
           scope: ""
@@ -33,9 +36,9 @@ security:
         kfrei-rest-api:
           authorization-grant-type: ""
           client-id: ""
-          client-name: ""
           client-secret: ""
-          scope: ""
+          # Requires at least: roles
+          scope: roles
 server:
   port: 8081
   shutdown: graceful
@@ -43,10 +46,10 @@ app:
   kfrei-rest-api:
     # Selection of the specific client implementation. Possible values are: mock, rest
     type: mock
-    base-url: http://localhost:8080
+    base-url: http://localhost:8080/api/v2
 springdoc:
   packages-to-scan: de.muenchen.oss.kfreimvgeai.rest
-  pathsToMatch: /api/V1/**
+  pathsToMatch: /api/v1/**
 logging:
   level:
     de.muenchen.oss: INFO

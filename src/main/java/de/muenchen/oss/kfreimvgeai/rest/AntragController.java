@@ -25,6 +25,7 @@ package de.muenchen.oss.kfreimvgeai.rest;
 import de.muenchen.oss.kfreimvgeai.adapter.KfreiRestApiServiceI;
 import de.muenchen.oss.kfreimvgeai.dto.MvgResponseDto;
 import de.muenchen.oss.kfreimvgeai.mapper.DefaultMapper;
+import de.muenchen.oss.kfreimvgeai.security.KfreiMvgEaiRoles;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,8 +51,15 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.util.UUID;
 
+/**
+ * Contains all endpoints for handling Anträge in the EAI.
+ * <p>
+ * This controller provides RESTful operations related to Anträge.
+ *
+ * @author felix.haala
+ */
 @RestController
-@RequestMapping("/api/V1/antraege")
+@RequestMapping("/api/v1/antraege")
 @Tag(name = "Anträge", description = "Operations for Anträge")
 @RequiredArgsConstructor
 @Slf4j
@@ -100,6 +109,7 @@ public class AntragController {
                     )
             }
     )
+    @PreAuthorize("hasRole('" + KfreiMvgEaiRoles.ANTRAG_READ + "')")
     public Mono<ResponseEntity<MvgResponseDto>> existsAntrag(
             @Parameter(description = "ID of Antrag", required = true)
             @PathVariable
@@ -112,24 +122,24 @@ public class AntragController {
     ) {
         String originUserName = authentication.getName();
         String requestId = UUID.randomUUID().toString();
-        log.info("Validating Antrag [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+        log.info("Validating Antrag [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                 antragId, geburtsdatum, originUserName, requestId);
 
         return this.kfreiRestApiService.existsAntrag(antragId, geburtsdatum, originUserName, requestId)
                 .map(this.mapper::kfreiResponseDtoToMvgResponseDto)
                 .map(mvgResponseDto -> {
-                    log.debug("Antrag found, returning info [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                    log.debug("Antrag found, returning info [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                             antragId, geburtsdatum, originUserName, requestId);
                     return ResponseEntity.ok(mvgResponseDto);
                 })
                 .onErrorResume(WebClientResponseException.NotFound.class, ex -> {
-                            log.debug("Antrag not found [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                            log.debug("Antrag not found [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                                     antragId, geburtsdatum, originUserName, requestId);
                             return Mono.just(ResponseEntity.notFound().build());
                         }
                 )
                 .onErrorResume(WebClientResponseException.class, ex -> {
-                            log.error("Unknown error [antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                            log.error("Unknown error [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                                     antragId, geburtsdatum, originUserName, requestId, ex);
                             return Mono.just(ResponseEntity.internalServerError().build());
                         }

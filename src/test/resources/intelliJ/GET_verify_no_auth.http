@@ -1,4 +1,0 @@
-// antragId: don't care
-// geburtsdatum: don't care
-// note: No authentication results in a 401 Unauthorized response.
-GET http://localhost:8081/api/V1/antraege/1111111111/exists?geburtsdatum=1989-11-30

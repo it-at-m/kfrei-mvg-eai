@@ -1,0 +1,6 @@
+## mock + rest
+  # antragId: don't care
+  # geburtsdatum: d1989-05-30
+  # note: Invalid argument results in a 400 BAD REQUEST response.
+GET http://localhost:8081/api/v1/antraege/1111111111/exists?geburtsdatum=d1989-05-30
+Authorization: Bearer {{$auth.token("keycloak")}}

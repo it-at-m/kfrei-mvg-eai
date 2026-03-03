@@ -26,13 +26,14 @@ import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.time.LocalDate;
 
 /**
- * Service for communication with the Application KFrei.
+ * Service for communication with the KFrei Application.
+ * <p>
+ * This service handles all interactions with the KFrei application through its KfreiRestApi.
  *
  * @author felix.haala
  */
@@ -48,6 +49,17 @@ public class KfreiRestApiService implements KfreiRestApiServiceI {
         log.info("Created KfreiRestApiService [baseUrl={}]", this.baseUrl);
     }
 
+    /**
+     * Retrieves information from the API endpoint of KFrei.
+     * <p>
+     * This method checks the existence of an Antrag by making a request to the KfreiRestApi.
+     *
+     * @param antragId       the ID of the Antrag to check
+     * @param geburtsdatum   the Geburtsdatum in the Antrag
+     * @param originUserName the userName of the requester
+     * @param requestId      the unique identifier for the request
+     * @return a Mono containing the response from the KfreiRestApi as a KfreiResponseDto
+     */
     public Mono<KfreiResponseDto> existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) {
         String path = "/antraege/{antragId}/exists";
 
@@ -65,10 +77,9 @@ public class KfreiRestApiService implements KfreiRestApiServiceI {
                 })
                 .retrieve()
                 .bodyToMono(KfreiResponseDto.class)
-                .log("KfreiRestApiService.existsAntrag")
+                .log("KfreiRestApiService.existsAntrag", java.util.logging.Level.WARNING)
                 .doOnNext(kfreiResponseDto -> log.debug("Response [kfreiResponseDto={}, requestId={}]", kfreiResponseDto, requestId))
-                .timeout(Duration.ofSeconds(5))
-                .retryWhen(Retry.fixedDelay(10, Duration.ofSeconds(1)));
+                .timeout(Duration.ofSeconds(10));
     }
 
 }

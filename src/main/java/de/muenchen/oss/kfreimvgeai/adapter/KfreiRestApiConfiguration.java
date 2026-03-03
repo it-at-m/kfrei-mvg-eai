@@ -26,17 +26,17 @@ import de.muenchen.oss.kfreimvgeai.config.AppConfigurationProperties;
 import de.muenchen.oss.kfreimvgeai.config.KfreiRestApiType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
- * Configuration class for setting up the Application KFrei service.
+ * Configuration class for setting up the KfreiRestApi.
  *
  * @author felix.haala
  */
@@ -44,24 +44,24 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class KfreiRestApiConfiguration {
 
     /**
-     * Creates an instance of KfreiRestApiService or its mock implementation 
-     * based on the configuration properties.
+     * Creates an instance of KfreiRestApiService or its mock implementation  based on the configuration properties.
      *
-     * @param appConfigurationProperties the configuration properties for the kfrei-mvg-eai
-     * @param clientRegistrationRepository the repository for client registration information
+     * @param appConfigurationProperties       the configuration properties for the kfrei-mvg-eai
+     * @param clientRegistrationRepository     the repository for client registration information
      * @param oAuth2AuthorizedClientRepository the repository for authorized OAuth2 clients
      * @return a configured instance implementing the KfreiRestApiServiceI
      */
     @Bean
     KfreiRestApiServiceI kfreiRestApiService(AppConfigurationProperties appConfigurationProperties,
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository) {
+            ReactiveClientRegistrationRepository clientRegistrationRepository,
+            ReactiveOAuth2AuthorizedClientService oAuth2AuthorizedClientRepository) {
         String baseUrl = appConfigurationProperties.getKfreiRestApi().getBaseUrl();
         KfreiRestApiType kfreiRestApiType = appConfigurationProperties.getKfreiRestApi().getType();
 
         return switch (kfreiRestApiType) {
             case REST -> {
-                OAuth2AuthorizedClientManager manager = kfreiRestApiAuthorizedClientManager(clientRegistrationRepository, oAuth2AuthorizedClientRepository);
+                ReactiveOAuth2AuthorizedClientManager manager = kfreiRestApiAuthorizedClientManager(clientRegistrationRepository,
+                        oAuth2AuthorizedClientRepository);
                 WebClient webClient = kfreiRestApiwebClient(manager, baseUrl);
                 yield new KfreiRestApiService(baseUrl, webClient);
             }
@@ -77,10 +77,11 @@ public class KfreiRestApiConfiguration {
      * @param oAuth2AuthorizedClientRepository the repository for authorized OAuth2 clients
      * @return the configured OAuth2AuthorizedClientManager
      */
-    OAuth2AuthorizedClientManager kfreiRestApiAuthorizedClientManager(ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository) {
-        DefaultOAuth2AuthorizedClientManager manager = new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository, oAuth2AuthorizedClientRepository);
-        OAuth2AuthorizedClientProvider provider = OAuth2AuthorizedClientProviderBuilder.builder()
+    ReactiveOAuth2AuthorizedClientManager kfreiRestApiAuthorizedClientManager(ReactiveClientRegistrationRepository clientRegistrationRepository,
+            ReactiveOAuth2AuthorizedClientService oAuth2AuthorizedClientRepository) {
+        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+                clientRegistrationRepository, oAuth2AuthorizedClientRepository);
+        ReactiveOAuth2AuthorizedClientProvider provider = ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
                 .clientCredentials()
                 .build();
         manager.setAuthorizedClientProvider(provider);
@@ -94,13 +95,12 @@ public class KfreiRestApiConfiguration {
      * @param baseUrl                       the base URL for the KfreiRestApiService
      * @return the configured WebClient instance
      */
-    WebClient kfreiRestApiwebClient(OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager,
-            String baseUrl) {
-        ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2 = new ServletOAuth2AuthorizedClientExchangeFilterFunction(oAuth2AuthorizedClientManager);
+    WebClient kfreiRestApiwebClient(ReactiveOAuth2AuthorizedClientManager oAuth2AuthorizedClientManager, String baseUrl) {
+        ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2 = new ServerOAuth2AuthorizedClientExchangeFilterFunction(oAuth2AuthorizedClientManager);
         oauth2.setDefaultClientRegistrationId("kfrei-rest-api");
         return WebClient.builder()
                 .baseUrl(baseUrl)
-                .apply(oauth2.oauth2Configuration())
+                .filter(oauth2)
                 .build();
     }
 
