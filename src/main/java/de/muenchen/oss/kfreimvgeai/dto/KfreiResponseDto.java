@@ -26,8 +26,6 @@ import java.time.LocalDate;
 
 /**
  * Data Transfer Object (DTO) for responses from the KfreiRestApi.
- * <p>
- * This class encapsulates the data returned by the KfreiRestApi and provides a structured way to access the response details.
  *
  * @author felix.haala
  */

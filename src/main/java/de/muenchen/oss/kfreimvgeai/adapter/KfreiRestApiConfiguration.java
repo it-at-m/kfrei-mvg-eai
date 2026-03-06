@@ -22,18 +22,19 @@
  */
 package de.muenchen.oss.kfreimvgeai.adapter;
 
-import de.muenchen.oss.kfreimvgeai.config.AppConfigurationProperties;
-import de.muenchen.oss.kfreimvgeai.config.KfreiRestApiType;
+import de.muenchen.oss.kfreimvgeai.properties.AppConfigurationProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProvider;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientProviderBuilder;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
-import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.client.OAuth2ClientHttpRequestInterceptor;
+import org.springframework.web.client.RestClient;
+
+import static org.springframework.security.oauth2.client.web.client.RequestAttributeClientRegistrationIdResolver.clientRegistrationId;
 
 /**
  * Configuration class for setting up the KfreiRestApi.
@@ -41,66 +42,84 @@ import org.springframework.web.reactive.function.client.WebClient;
  * @author felix.haala
  */
 @Configuration
+@Slf4j
 public class KfreiRestApiConfiguration {
 
     /**
-     * Creates an instance of KfreiRestApiService or its mock implementation  based on the configuration properties.
+     * Creates an instance of KfreiRestApiService based on the specified configuration properties.
      *
-     * @param appConfigurationProperties       the configuration properties for the kfrei-mvg-eai
-     * @param clientRegistrationRepository     the repository for client registration information
-     * @param oAuth2AuthorizedClientRepository the repository for authorized OAuth2 clients
-     * @return a configured instance implementing the KfreiRestApiServiceI
+     * @param restClient the RestClient instance used for making REST API calls to the KfreiRestApi
+     * @return a configured instance of KfreiRestApiService
      */
     @Bean
-    KfreiRestApiServiceI kfreiRestApiService(AppConfigurationProperties appConfigurationProperties,
-            ReactiveClientRegistrationRepository clientRegistrationRepository,
-            ReactiveOAuth2AuthorizedClientService oAuth2AuthorizedClientRepository) {
-        String baseUrl = appConfigurationProperties.getKfreiRestApi().getBaseUrl();
-        KfreiRestApiType kfreiRestApiType = appConfigurationProperties.getKfreiRestApi().getType();
-
-        return switch (kfreiRestApiType) {
-            case REST -> {
-                ReactiveOAuth2AuthorizedClientManager manager = kfreiRestApiAuthorizedClientManager(clientRegistrationRepository,
-                        oAuth2AuthorizedClientRepository);
-                WebClient webClient = kfreiRestApiwebClient(manager, baseUrl);
-                yield new KfreiRestApiService(baseUrl, webClient);
-            }
-            case MOCK -> new KfreiRestApiServiceMock(baseUrl);
-            case null -> throw new IllegalStateException("KfreiRestApiType is not defined");
-        };
+    @Profile("!mock-kfreiRestApi")
+    KfreiRestApiService kfreiRestApiService(RestClient restClient) {
+        log.info("Initializing KfreiRestApiService");
+        return new KfreiRestApiService(restClient);
     }
 
     /**
-     * Configures the ClientRegistrationRepository and OAuth2AuthorizedClientRepository for the KfreiRestApiService to enable OAuth2 authentication.
+     * Creates an instance of KfreiRestApiServiceMock based on the specified configuration properties.
      *
-     * @param clientRegistrationRepository     the repository for client registration information
-     * @param oAuth2AuthorizedClientRepository the repository for authorized OAuth2 clients
-     * @return the configured OAuth2AuthorizedClientManager
+     * @return a configured instance of KfreiRestApiServiceMock ready for use in tests
      */
-    ReactiveOAuth2AuthorizedClientManager kfreiRestApiAuthorizedClientManager(ReactiveClientRegistrationRepository clientRegistrationRepository,
-            ReactiveOAuth2AuthorizedClientService oAuth2AuthorizedClientRepository) {
-        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager manager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
-                clientRegistrationRepository, oAuth2AuthorizedClientRepository);
-        ReactiveOAuth2AuthorizedClientProvider provider = ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
+    @Bean
+    @Profile("mock-kfreiRestApi")
+    KfreiRestApiServiceMock kfreiRestApiServiceMock() {
+        log.info("Initializing KfreiRestApiServiceMock");
+        return new KfreiRestApiServiceMock();
+    }
+
+    /**
+     * Configures a RestClient for the KfreiRestApiService to enable OAuth2 authentication.
+     *
+     * @param clientRegistrationRepository  the repository for managing client registrations for OAuth2
+     * @param oAuth2AuthorizedClientService the service for managing authorized OAuth2 clients and their tokens
+     * @param appConfigurationProperties    the application configuration properties used to customize the setup of the RestClient
+     * @return the configured RestClient instance
+     */
+    @Bean
+    @Profile("!mock-kfreiRestApi & !no-security")
+    RestClient kfreiRestApirestClient(ClientRegistrationRepository clientRegistrationRepository,
+            OAuth2AuthorizedClientService oAuth2AuthorizedClientService,
+            AppConfigurationProperties appConfigurationProperties) {
+        var manager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+                clientRegistrationRepository,
+                oAuth2AuthorizedClientService);
+
+        var provider = OAuth2AuthorizedClientProviderBuilder.builder()
                 .clientCredentials()
                 .build();
+
         manager.setAuthorizedClientProvider(provider);
-        return manager;
+
+        var oauth2Interceptor = new OAuth2ClientHttpRequestInterceptor(manager);
+
+        String baseUrl = appConfigurationProperties.getKfreiRestApi().getBaseUrl();
+        log.info("Initializing RestClient with OAuth2 configuration [baseUrl={}]", baseUrl);
+
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .requestInterceptor(oauth2Interceptor)
+                .defaultRequest(request ->
+                        request.attributes(clientRegistrationId("kfrei-rest-api")))
+                .build();
     }
 
     /**
-     * Configures a WebClient for the KfreiRestApiService to enable OAuth2 authentication.
+     * Configures a RestClient for the KfreiRestApiService without security features.
      *
-     * @param oAuth2AuthorizedClientManager the manager for authorized OAuth2 clients
-     * @param baseUrl                       the base URL for the KfreiRestApiService
-     * @return the configured WebClient instance
+     * @param appConfigurationProperties the application configuration properties
+     * @return a RestClient instance configured for the KfreiRestApi without security features, ready for use in non-secure environments
      */
-    WebClient kfreiRestApiwebClient(ReactiveOAuth2AuthorizedClientManager oAuth2AuthorizedClientManager, String baseUrl) {
-        ServerOAuth2AuthorizedClientExchangeFilterFunction oauth2 = new ServerOAuth2AuthorizedClientExchangeFilterFunction(oAuth2AuthorizedClientManager);
-        oauth2.setDefaultClientRegistrationId("kfrei-rest-api");
-        return WebClient.builder()
+    @Bean
+    @Profile("!mock-kfreiRestApi & no-security")
+    RestClient kfreiRestApirestClientNoSecurity(AppConfigurationProperties appConfigurationProperties) {
+        String baseUrl = appConfigurationProperties.getKfreiRestApi().getBaseUrl();
+        log.info("Initializing RestClient without security configuration [baseUrl={}]", baseUrl);
+
+        return RestClient.builder()
                 .baseUrl(baseUrl)
-                .filter(oauth2)
                 .build();
     }
 

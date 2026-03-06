@@ -1,7 +1,7 @@
 spring:
   profiles:
-    # Possible values are: logstash, no-security
-    active: logstash, no-security
+    # Possible values are: logstash, no-security, mock-kfreiRestApi
+    active:
   application:
     name: kfrei-mvg-eai
   web:
@@ -42,12 +42,19 @@ security:
 server:
   port: 8081
   shutdown: graceful
+management:
+  server:
+    port: 8082
 app:
   kfrei-rest-api:
-    # Selection of the specific client implementation. Possible values are: mock, rest
-    type: mock
     base-url: http://localhost:8080/api/v2
 springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: false
+    supported-submit-methods: []
   packages-to-scan: de.muenchen.oss.kfreimvgeai.rest
   pathsToMatch: /api/v1/**
 logging:
@@ -55,3 +62,15 @@ logging:
     de.muenchen.oss: INFO
     org.springframework: INFO
     root: WARN
+
+---
+spring:
+  config:
+    activate:
+      on-profile:
+        - no-security
+springdoc:
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
+    supported-submit-methods: []

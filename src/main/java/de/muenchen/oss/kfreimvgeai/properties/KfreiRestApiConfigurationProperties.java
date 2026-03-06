@@ -20,16 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.muenchen.oss.kfreimvgeai.config;
+package de.muenchen.oss.kfreimvgeai.properties;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Enum representing the types of clients that can be used with the KfreiRestApi.
- * <p>
- * This enum allows the selection of the specific client implementation to be used for communication.
+ * Configuration properties for the KfreiRestApiService.
  *
  * @author felix.haala
  */
-public enum KfreiRestApiType {
-    REST,
-    MOCK
+@Getter
+@Setter
+@NoArgsConstructor
+@ConfigurationProperties(prefix = "app.kfrei-rest-api")
+public class KfreiRestApiConfigurationProperties {
+
+    private String baseUrl;
+
 }

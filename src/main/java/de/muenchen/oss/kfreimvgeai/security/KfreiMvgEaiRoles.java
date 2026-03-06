@@ -27,9 +27,6 @@ import lombok.NoArgsConstructor;
 
 /**
  * Contains all known roles of the OAuth2 client "kfrei-mvg-eai" as constants.
- * <p>
- * This class provides a centralized definition of roles used for authorization within the application, allowing for easy reference and management of role
- * constants.
  *
  * @author felix.haala
  */
@@ -40,8 +37,6 @@ public class KfreiMvgEaiRoles {
 
     /**
      * Returns an array of all known roles.
-     * <p>
-     * This method provides a centralized way to access the defined role constants for authorization purposes.
      *
      * @return an array of role constants.
      */

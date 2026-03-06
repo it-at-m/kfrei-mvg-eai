@@ -31,12 +31,17 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Tests for the MapStruct mappers used in the application.
+ *
+ * @author felix.haala
+ */
 class DefaultMapperTest {
 
-    private final DefaultMapper sut = Mappers.getMapper(DefaultMapper.class);
+    DefaultMapper sut = Mappers.getMapper(DefaultMapper.class);
 
     @Test
-    void kfreiResponseDtoToMvgResponseDto() {
+    void kfreiResponseDtoToMvgResponseDtoTest() {
         KfreiResponseDto src = new KfreiResponseDto(LocalDate.of(2025, 12, 31), LocalDate.of(2026, 11, 30));
         MvgResponseDto expected = new MvgResponseDto(LocalDate.of(2025, 12, 31), LocalDate.of(2026, 11, 30));
         MvgResponseDto actual = sut.kfreiResponseDtoToMvgResponseDto(src);

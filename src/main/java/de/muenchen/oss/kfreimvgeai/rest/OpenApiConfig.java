@@ -32,28 +32,43 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Configuration class for the OpenAPI documentation of the kfrei-mvg-eai API.
+ *
+ * @author felix.haala
+ */
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "Swagger KFrei API",
-                description = "API for communicating with kfrei-mvg-eai",
-                version = "v1.0.0"
+                title = "kfrei-mvg-eai API",
+                version = "v1.0.0",
+                description = "REST API for communicating with kfrei-mvg-eai secured via OAuth2 Client Credentials."
         ),
-        security = @SecurityRequirement(name = "oauth2")
+        security = @SecurityRequirement(name = OpenApiConfig.OAUTH2_SCHEME_NAME)
+
 )
 @SecurityScheme(
-        name = "oauth2",
+        name = OpenApiConfig.OAUTH2_SCHEME_NAME,
         type = SecuritySchemeType.OAUTH2,
         flows = @OAuthFlows(
-                authorizationCode = @OAuthFlow(
-                        authorizationUrl = "https://auth.example.com/oauth/authorize",
-                        tokenUrl = "https://auth.example.com/oauth/token",
+                clientCredentials = @OAuthFlow(
+                        tokenUrl = "https://example.com/auth/realms/example/protocol/openid-connect/token",
                         scopes = {
-                                @OAuthScope(name = "read", description = "read access")
+                                @OAuthScope(
+                                        name = "roles",
+                                        description = "Requires scope [roles]"
+                                )
+                                ,
+                                @OAuthScope(
+                                        name = "ANTRAG_READ",
+                                        description = "Requires role [ANTRAG_READ] in [resource_access.client-name.roles]"
+                                )
                         }
                 )
         )
 )
-public interface OpenApiConfig {
+public class OpenApiConfig {
+
+    public final static String OAUTH2_SCHEME_NAME = "oAuth2ClientCredentials";
 
 }

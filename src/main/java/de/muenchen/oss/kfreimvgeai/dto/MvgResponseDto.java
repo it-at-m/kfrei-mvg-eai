@@ -26,8 +26,6 @@ import java.time.LocalDate;
 
 /**
  * Data Transfer Object (DTO) for responses sent to the MVG.
- * <p>
- * This class encapsulates the data that is returned to the caller (MVG) and provides a structured way to access the response details.
  *
  * @author felix.haala
  */

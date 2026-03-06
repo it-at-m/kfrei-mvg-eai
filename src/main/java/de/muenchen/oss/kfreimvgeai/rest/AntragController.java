@@ -23,12 +23,14 @@
 package de.muenchen.oss.kfreimvgeai.rest;
 
 import de.muenchen.oss.kfreimvgeai.adapter.KfreiRestApiServiceI;
+import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import de.muenchen.oss.kfreimvgeai.dto.MvgResponseDto;
 import de.muenchen.oss.kfreimvgeai.mapper.DefaultMapper;
 import de.muenchen.oss.kfreimvgeai.security.KfreiMvgEaiRoles;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -37,6 +39,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -45,16 +49,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 /**
  * Contains all endpoints for handling Anträge in the EAI.
- * <p>
- * This controller provides RESTful operations related to Anträge.
  *
  * @author felix.haala
  */
@@ -68,11 +69,11 @@ public class AntragController {
     private final KfreiRestApiServiceI kfreiRestApiService;
     private final DefaultMapper mapper;
 
-    @GetMapping("/{antragId}/exists")
+    @GetMapping(path = "/{antragId}/exists", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(
             summary = "Verify an Antrag",
             description = "Verifies that an Antrag with given information exists",
-            security = @SecurityRequirement(name = "oauth2")
+            security = @SecurityRequirement(name = "oAuth2ClientCredentials")
     )
     @ApiResponses(
             {
@@ -81,7 +82,12 @@ public class AntragController {
                             description = "Antrag exists",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = MvgResponseDto.class)
+                                    schema = @Schema(implementation = MvgResponseDto.class),
+                                    examples = @ExampleObject(
+                                            """
+                                                    { "gueltigAb": "2025-12-24", "gueltigBis": "2026-12-01" }
+                                                    """
+                                    )
                             )
                     ),
                     @ApiResponse(
@@ -89,13 +95,9 @@ public class AntragController {
                             description = "Bad Request",
                             content = @Content(
                                     mediaType = "text/plain",
-                                    schema = @Schema(type = "string")
+                                    schema = @Schema(type = "string"),
+                                    examples = @ExampleObject("Invalid argument [propertyName=%s, value=%s]")
                             )
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized access",
-                            content = @Content
                     ),
                     @ApiResponse(
                             responseCode = "404",
@@ -110,7 +112,7 @@ public class AntragController {
             }
     )
     @PreAuthorize("hasRole('" + KfreiMvgEaiRoles.ANTRAG_READ + "')")
-    public Mono<ResponseEntity<MvgResponseDto>> existsAntrag(
+    public ResponseEntity<MvgResponseDto> existsAntrag(
             @Parameter(description = "ID of Antrag", required = true)
             @PathVariable
             long antragId,
@@ -125,25 +127,24 @@ public class AntragController {
         log.info("Validating Antrag [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                 antragId, geburtsdatum, originUserName, requestId);
 
-        return this.kfreiRestApiService.existsAntrag(antragId, geburtsdatum, originUserName, requestId)
-                .map(this.mapper::kfreiResponseDtoToMvgResponseDto)
-                .map(mvgResponseDto -> {
-                    log.debug("Antrag found, returning info [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
-                            antragId, geburtsdatum, originUserName, requestId);
-                    return ResponseEntity.ok(mvgResponseDto);
-                })
-                .onErrorResume(WebClientResponseException.NotFound.class, ex -> {
-                            log.debug("Antrag not found [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
-                                    antragId, geburtsdatum, originUserName, requestId);
-                            return Mono.just(ResponseEntity.notFound().build());
-                        }
-                )
-                .onErrorResume(WebClientResponseException.class, ex -> {
-                            log.error("Unknown error [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
-                                    antragId, geburtsdatum, originUserName, requestId, ex);
-                            return Mono.just(ResponseEntity.internalServerError().build());
-                        }
-                );
+        try {
+            KfreiResponseDto kfreiResponseDto = kfreiRestApiService.existsAntrag(antragId, geburtsdatum, originUserName, requestId);
+            MvgResponseDto mvgResponseDto = this.mapper.kfreiResponseDtoToMvgResponseDto(kfreiResponseDto);
+
+            log.debug("Antrag found, returning info [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
+                    antragId, geburtsdatum, originUserName, requestId);
+            return ResponseEntity.ok(mvgResponseDto);
+        } catch (RestClientResponseException ex) {
+            if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                log.debug("Antrag not found [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
+                        antragId, geburtsdatum, originUserName, requestId);
+                return ResponseEntity.notFound().build();
+            }
+
+            log.error("Unknown error [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
+                    antragId, geburtsdatum, originUserName, requestId, ex);
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

@@ -20,27 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.muenchen.oss.kfreimvgeai.config;
+package de.muenchen.oss.kfreimvgeai.properties;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
 /**
- * Configuration properties for the KfreiRestApiService.
- * <p>
- * This class holds the properties required to configure the KfreiRestApiService.
+ * Configuration properties for the application kfrei-mvg-eai.
  *
  * @author felix.haala
  */
 @Getter
 @Setter
 @NoArgsConstructor
-@ConfigurationProperties(prefix = "app.kfrei-rest-api")
-public class KfreiRestApiConfigurationProperties {
+@ConfigurationProperties(prefix = "app")
+public class AppConfigurationProperties {
 
-    private KfreiRestApiType type;
-    private String baseUrl;
+    @NestedConfigurationProperty
+    private KfreiRestApiConfigurationProperties kfreiRestApi;
 
 }

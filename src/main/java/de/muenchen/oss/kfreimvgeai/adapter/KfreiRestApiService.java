@@ -24,49 +24,33 @@ package de.muenchen.oss.kfreimvgeai.adapter;
 
 import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 /**
- * Service for communication with the KFrei Application.
- * <p>
- * This service handles all interactions with the KFrei application through its KfreiRestApi.
+ * Service for communicating with the KFrei Application.
  *
  * @author felix.haala
  */
 @Slf4j
 public class KfreiRestApiService implements KfreiRestApiServiceI {
 
-    private final String baseUrl;
-    private final WebClient webClient;
+    private final RestClient restClient;
 
-    public KfreiRestApiService(String baseUrl, WebClient webClient) {
-        this.baseUrl = baseUrl;
-        this.webClient = webClient;
-        log.info("Created KfreiRestApiService [baseUrl={}]", this.baseUrl);
+    public KfreiRestApiService(RestClient restClient) {
+        this.restClient = restClient;
+        log.debug("Initialized KfreiRestApiService");
     }
 
-    /**
-     * Retrieves information from the API endpoint of KFrei.
-     * <p>
-     * This method checks the existence of an Antrag by making a request to the KfreiRestApi.
-     *
-     * @param antragId       the ID of the Antrag to check
-     * @param geburtsdatum   the Geburtsdatum in the Antrag
-     * @param originUserName the userName of the requester
-     * @param requestId      the unique identifier for the request
-     * @return a Mono containing the response from the KfreiRestApi as a KfreiResponseDto
-     */
-    public Mono<KfreiResponseDto> existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) {
+    public KfreiResponseDto existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) throws RestClientResponseException {
         String path = "/antraege/{antragId}/exists";
 
-        log.debug("Requesting KfreiRestApi [baseUrl={}, path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
-                this.baseUrl, path, antragId, geburtsdatum, originUserName, requestId);
+        log.debug("Requesting KfreiRestApi [path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                path, antragId, geburtsdatum, originUserName, requestId);
 
-        return this.webClient.get()
+        KfreiResponseDto kfreiResponseDto = this.restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(path)
                         .queryParam("geburtsdatum", geburtsdatum)
@@ -76,10 +60,10 @@ public class KfreiRestApiService implements KfreiRestApiServiceI {
                     h.add("x-request-id", requestId);
                 })
                 .retrieve()
-                .bodyToMono(KfreiResponseDto.class)
-                .log("KfreiRestApiService.existsAntrag", java.util.logging.Level.WARNING)
-                .doOnNext(kfreiResponseDto -> log.debug("Response [kfreiResponseDto={}, requestId={}]", kfreiResponseDto, requestId))
-                .timeout(Duration.ofSeconds(10));
+                .body(KfreiResponseDto.class);
+
+        log.debug("Response [kfreiResponseDto={}, requestId={}]", kfreiResponseDto, requestId);
+        return kfreiResponseDto;
     }
 
 }

@@ -26,52 +26,43 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.server.resource.authentication.ExpressionJwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
-import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
-import reactor.core.publisher.Mono;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Default security configuration for setting up filter chains in Spring.
- * <p>
- * This class configures security filters to manage authentication and authorization for incoming requests, ensuring that the application adheres to security
- * best practices.
  *
  * @author felix.haala
  */
 @Configuration
-@EnableWebFluxSecurity
-class DefaultSecurityConfiguration {
+@EnableWebSecurity
+@EnableMethodSecurity
+public class DefaultSecurityConfiguration {
 
     /**
      * Security filter chain for securing API calls.
-     * <p>
-     * This configuration sets up security measures specifically for API endpoints, ensuring that proper authentication and authorization mechanisms are
-     * enforced for all incoming API requests.
      *
-     * @param http the ServerHttpSecurity object used for configuring security
-     * @return the configured SecurityWebFilterChain
+     * @param http the HttpSecurity object used for configuring security
+     * @return the configured SecurityFilterChain
      */
     @Bean
     @Order(1)
     @Profile("!no-security")
-    SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http) {
+    SecurityFilterChain apiFilterChain(HttpSecurity http) {
         http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/**"))
+                .securityMatcher("/api/**")
                 // Disable CSRF. API is stateless and uses token-based authentication (Authorization header)
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .csrf(AbstractHttpConfigurer::disable)
                 // Allow role-based access to the API
-                .authorizeExchange(auth -> auth.anyExchange().hasAnyRole(KfreiMvgEaiRoles.getAll()))
+                .authorizeHttpRequests(auth -> auth.anyRequest().hasAnyRole(KfreiMvgEaiRoles.getAll()))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .jwtAuthenticationConverter(this.jwtAuthenticationConverter()))
@@ -84,7 +75,7 @@ class DefaultSecurityConfiguration {
      *
      * @return the configured Converter
      */
-    private Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverter() {
+    private JwtAuthenticationConverter jwtAuthenticationConverter() {
         Expression expression = new SpelExpressionParser().parseExpression("['resource_access']['kfrei-mvg-eai']['roles']");
 
         ExpressionJwtGrantedAuthoritiesConverter authoritiesConverter = new ExpressionJwtGrantedAuthoritiesConverter(expression);
@@ -93,57 +84,52 @@ class DefaultSecurityConfiguration {
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
         jwtConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
 
-        return new ReactiveJwtAuthenticationConverterAdapter(jwtConverter);
+        return jwtConverter;
     }
 
     /**
      * Security filter chain for securing web requests.
-     * <p>
-     * This configuration sets up security configurations for web-based interactions, applying authentication and authorization rules to protect web endpoints
-     * and user sessions.
      *
-     * @param http the ServerHttpSecurity object used for configuring security
-     * @return the configured SecurityWebFilterChain
+     * @param http the HttpSecurity object used for configuring security
+     * @return the configured SecurityFilterChain
      */
     @Bean()
     @Order(2)
     @Profile("!no-security")
-    SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
+    SecurityFilterChain webFilterChain(HttpSecurity http) {
         return http
-                .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/**"))
+                .securityMatcher("/**")
                 // Disable CSRF. API is stateless and uses token-based authentication (Authorization header)
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(auth -> auth
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
                         // Allow authenticated usage of OpenAPI-Specification
-                        .pathMatchers("/v3/api-docs*/**").authenticated()
-                        .pathMatchers("/swagger-ui/**").authenticated()
-                        .pathMatchers("/swagger-ui.html").authenticated()
+                        .requestMatchers("/v3/api-docs*/**").authenticated()
+                        .requestMatchers("/swagger-ui/**").authenticated()
+                        .requestMatchers("/swagger-ui.html").authenticated()
                         // Allow public usage of liveness
-                        .pathMatchers("/actuator/health/liveness").permitAll()
+                        .requestMatchers("/actuator/health/liveness").permitAll()
+                        .requestMatchers("/actuator/health/readiness").permitAll()
                         // Allow authenticated usage of health
-                        .pathMatchers("/actuator/health/**").authenticated()
+                        .requestMatchers("/actuator/health/**").authenticated()
                         // Deny anything else
-                        .anyExchange().denyAll())
+                        .anyRequest().denyAll())
                 .oauth2Login(Customizer.withDefaults())
                 .build();
     }
 
     /**
      * Security configuration that allows unrestricted access.
-     * <p>
-     * This configuration is used to disable security measures, allowing the application to run without authentication for development or testing purposes. It
-     * should not be used in production environments.
      *
-     * @param http the ServerHttpSecurity object used for configuring security
-     * @return the configured SecurityWebFilterChain
+     * @param http the HttpSecurity object used for configuring security
+     * @return the configured SecurityFilterChain
      */
     @Bean
     @Profile("no-security")
-    SecurityWebFilterChain noSecurityFilterChain(ServerHttpSecurity http) {
+    SecurityFilterChain noSecurityFilterChain(HttpSecurity http) {
         return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(auth ->
-                        auth.anyExchange().permitAll()
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth ->
+                        auth.anyRequest().permitAll()
                 ).build();
     }
 

@@ -23,7 +23,6 @@
 package de.muenchen.oss.kfreimvgeai.adapter;
 
 import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -35,14 +34,14 @@ import java.time.LocalDate;
 public interface KfreiRestApiServiceI {
 
     /**
-     * Checks if an Antrag with the given information exists.
+     * This method checks the existence of an Antrag and provides metadata.
      *
      * @param antragId       ID of the Antrag
      * @param geburtsdatum   Geburtsdatum in the Antrag
      * @param originUserName Username from authentication, used for tracing
      * @param requestId      Generated ID, used for tracing
-     * @return Mono of {@link KfreiResponseDto} for further processing
+     * @return {@link KfreiResponseDto} with metadata of the Antrag
      */
-    Mono<KfreiResponseDto> existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId);
+    KfreiResponseDto existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId);
 
 }

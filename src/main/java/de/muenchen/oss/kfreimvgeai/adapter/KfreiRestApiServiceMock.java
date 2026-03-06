@@ -25,8 +25,7 @@ package de.muenchen.oss.kfreimvgeai.adapter;
 import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDate;
 
@@ -38,33 +37,30 @@ import java.time.LocalDate;
 @Slf4j
 public class KfreiRestApiServiceMock implements KfreiRestApiServiceI {
 
-    private final String baseUrl;
-
-    public KfreiRestApiServiceMock(String baseUrl) {
-        this.baseUrl = baseUrl;
-        log.info("Created KfreiRestApiServiceMock [baseUrl={}]", this.baseUrl);
+    public KfreiRestApiServiceMock() {
+        log.debug("Initialized KfreiRestApiServiceMock");
     }
 
-    public Mono<KfreiResponseDto> existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) {
+    public KfreiResponseDto existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId) throws RestClientResponseException {
         String path = "/antraege/{antragId}/exists";
 
-        log.debug("Requesting KfreiRestApiMock [baseUrl={}, path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
-                this.baseUrl, path, antragId, geburtsdatum, originUserName, requestId);
+        log.debug("Requesting KfreiRestApiMock [path={}, antragId={}, geburtsdatum={}, originUserName={}, requestId={}]",
+                path, antragId, geburtsdatum, originUserName, requestId);
 
         if (antragId == 0L) {
-            return Mono.error(WebClientResponseException.create(
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error", null, null, null));
+            throw new RestClientResponseException(
+                    "Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR.value(), "Internal Server Error", null, null, null);
         }
 
         KfreiResponseDto kfreiResponseDto = mockRequest(antragId, geburtsdatum);
 
         if (kfreiResponseDto == null) {
-            return Mono.error(WebClientResponseException.create(
-                    HttpStatus.NOT_FOUND.value(), "Not Found", null, null, null));
+            throw new RestClientResponseException(
+                    "Not Found", HttpStatus.NOT_FOUND.value(), "Not Found", null, null, null);
         }
 
         log.debug("Response [kfreiResponseDto={}, requestId={}]", kfreiResponseDto, requestId);
-        return Mono.just(kfreiResponseDto);
+        return kfreiResponseDto;
     }
 
     private static KfreiResponseDto mockRequest(long antragId, LocalDate geburtsdatum) {
@@ -84,7 +80,7 @@ public class KfreiRestApiServiceMock implements KfreiRestApiServiceI {
         if (antragId == 4444444444L && geburtsdatum.isEqual(LocalDate.of(1989, 10, 31))) {
             return new KfreiResponseDto(LocalDate.of(2027, 1, 30), LocalDate.of(2027, 12, 31));
         }
-        
+
         return null;
     }
 

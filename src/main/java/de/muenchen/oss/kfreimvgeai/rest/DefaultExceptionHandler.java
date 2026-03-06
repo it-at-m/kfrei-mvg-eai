@@ -23,17 +23,13 @@
 package de.muenchen.oss.kfreimvgeai.rest;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * Global exception handler for REST controllers.
- * <p>
- * This class provides centralized exception handling for all REST API endpoints, allowing for consistent error responses and improved maintainability. It
- * handles specific exceptions and translates them into appropriate HTTP responses.
  *
  * @author felix.haala
  */
@@ -42,19 +38,17 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class DefaultExceptionHandler {
 
     /**
-     * Handles MethodArgumentTypeMismatchException for REST API endpoints.
-     * <p>
-     * This method is triggered when a method argument type mismatch occurs, such as when a request parameter cannot be converted to the expected type. It
+     * Handles TypeMismatchException for REST API endpoints.
      * returns a meaningful error response to the client, indicating the nature of the type mismatch.
      *
-     * @param ex the MethodArgumentTypeMismatchException that was thrown
+     * @param ex the TypeMismatchException that was thrown
      * @return a ResponseEntity containing an error message and HTTP status 400 BAD REQUEST
      */
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<String> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        String message = "Invalid argument [name=%s, value=%s]".formatted(ex.getName(), ex.getValue());
+    @ExceptionHandler(TypeMismatchException.class)
+    public ResponseEntity<String> handleTypeMismatchException(TypeMismatchException ex) {
+        String message = "Invalid argument [propertyName=%s, value=%s]".formatted(ex.getPropertyName(), ex.getValue());
         log.warn(message);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+        return ResponseEntity.badRequest().body(message);
     }
 
 }

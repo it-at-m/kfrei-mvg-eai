@@ -30,22 +30,17 @@ import org.mapstruct.ReportingPolicy;
 
 /**
  * Mapper interface for transforming data between different representations.
- * <p>
- * This interface is responsible for mapping data from one object type to another, facilitating the conversion between domain models, DTOs, and other data
- * formats.
  *
  * @author felix.haala
  */
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
+        unmappedTargetPolicy = ReportingPolicy.ERROR
 )
 public interface DefaultMapper {
 
     /**
      * Maps {@link KfreiResponseDto} to {@link MvgResponseDto}.
-     * <p>
-     * This method transforms the data from the source {@link KfreiResponseDto} into the destination {@link MvgResponseDto}.
      *
      * @param kfreiResponseDto the source object to map from
      * @return the mapped {@link MvgResponseDto} destination object
