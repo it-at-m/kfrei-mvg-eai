@@ -11,34 +11,22 @@ spring:
         enabled: false
 security:
   oauth2:
-    # OAuth2 configuration for accessing the kfrei-mvg-eai api
+    # OAuth2 configuration for accessing the kfrei-mvg-eai
     resourceserver:
       jwt:
         issuer-uri: ""
     client:
       provider:
-        # OAuth2 provider for accessing the kfrei-mvg-eai web application
-        kfrei-mvg-eai-web:
-          issuer-uri: ""
-          user-info-uri: ""
-          user-name-attribute: ""
         # OAuth2 provider for accessing the KfreiRestApi
         kfrei-rest-api:
           issuer-uri: ""
       registration:
-        # OAuth2 registration for accessing the kfrei-mvg-eai web application
-        kfrei-mvg-eai-web:
-          authorization-grant-type: ""
-          client-id: ""
-          client-secret: ""
-          redirect-uri: ""
-          scope: ""
           # OAuth2 registration for accessing the KfreiRestApi
         kfrei-rest-api:
           authorization-grant-type: ""
           client-id: ""
           client-secret: ""
-          # Requires at least: roles
+          # Requires: roles
           scope: roles
 server:
   port: 8080
