@@ -23,14 +23,18 @@
 package de.muenchen.oss.kfreimvgeai.rest;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.security.OAuthFlow;
-import io.swagger.v3.oas.annotations.security.OAuthFlows;
-import io.swagger.v3.oas.annotations.security.OAuthScope;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Configuration class for the OpenAPI documentation of the kfrei-mvg-eai API.
@@ -42,33 +46,53 @@ import org.springframework.context.annotation.Configuration;
         info = @Info(
                 title = "kfrei-mvg-eai API",
                 version = "v1.0.0",
-                description = "REST API for communicating with kfrei-mvg-eai secured via OAuth2 Client Credentials."
-        ),
-        security = @SecurityRequirement(name = OpenApiConfig.OAUTH2_SCHEME_NAME)
-
-)
-@SecurityScheme(
-        name = OpenApiConfig.OAUTH2_SCHEME_NAME,
-        type = SecuritySchemeType.OAUTH2,
-        flows = @OAuthFlows(
-                clientCredentials = @OAuthFlow(
-                        tokenUrl = "https://example.com/auth/realms/example/protocol/openid-connect/token",
-                        scopes = {
-                                @OAuthScope(
-                                        name = "roles",
-                                        description = "Requires scope [roles]"
-                                )
-                                ,
-                                @OAuthScope(
-                                        name = "ANTRAG_READ",
-                                        description = "Requires role [ANTRAG_READ] in [resource_access.client-name.roles]"
-                                )
-                        }
-                )
+                description = "REST API for communicating with kfrei-mvg-eai."
         )
 )
 public class OpenApiConfig {
 
-    public final static String OAUTH2_SCHEME_NAME = "oAuth2ClientCredentials";
+    public static final String OAUTH2_SCHEME_NAME = "oAuth2ClientCredentials";
+
+    @Bean
+    @Profile("!no-security")
+    public OpenAPI customOpenAPI(OAuth2ClientProperties properties) {
+        String tokenUrl = properties.getProvider()
+                .get("kfrei-mvg-eai")
+                .getTokenUri();
+
+        SecurityScheme oauthScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.OAUTH2)
+                .description("""
+                        This API requires an access token issued by the SSO system.  The token must be sent in the HTTP Authorization header:
+                        
+                            Authorization: Bearer <access_token>
+                        
+                        Example: obtain a token using client credentials
+                        
+                            curl -X POST %s \
+                              -H "Content-Type: application/x-www-form-urlencoded" \
+                              -d "grant_type=client_credentials" \
+                              -d "client-id:<client-id>" \
+                              -d "client_secret=<client-secret>"
+                              -d "scope=roles"
+                        
+                        The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
+                        
+                            resource_access.<client-name>.roles
+                        """.formatted(tokenUrl))
+                .flows(new OAuthFlows()
+                        .clientCredentials(new OAuthFlow()
+                                .tokenUrl(tokenUrl)
+                                .scopes(new Scopes()
+                                        .addString("roles", "All client roles, including ANTRAG_READ, etc."))
+                        )
+                );
+
+        return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes(OAUTH2_SCHEME_NAME, oauthScheme))
+                .addSecurityItem(new SecurityRequirement()
+                        .addList(OAUTH2_SCHEME_NAME));
+    }
 
 }

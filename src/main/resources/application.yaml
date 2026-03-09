@@ -4,6 +4,7 @@ spring:
     active:
   application:
     name: kfrei-mvg-eai
+  # Disable default error page to avoid exposing any internal information
   web:
     error:
       whitelabel:
@@ -45,6 +46,10 @@ server:
 management:
   server:
     port: 8082
+  endpoints:
+    web:
+      exposure:
+        include: liveness,readiness
 app:
   kfrei-rest-api:
     base-url: http://localhost:8080/api/v2
@@ -53,8 +58,6 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
-    try-it-out-enabled: false
-    supported-submit-methods: []
   packages-to-scan: de.muenchen.oss.kfreimvgeai.rest
   pathsToMatch: /api/v1/**
 logging:
@@ -62,15 +65,3 @@ logging:
     de.muenchen.oss: INFO
     org.springframework: INFO
     root: WARN
-
----
-spring:
-  config:
-    activate:
-      on-profile:
-        - no-security
-springdoc:
-  swagger-ui:
-    enabled: true
-    try-it-out-enabled: true
-    supported-submit-methods: []

@@ -102,15 +102,12 @@ public class DefaultSecurityConfiguration {
                 // Disable CSRF. API is stateless and uses token-based authentication (Authorization header)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Allow authenticated usage of OpenAPI-Specification
-                        .requestMatchers("/v3/api-docs*/**").authenticated()
-                        .requestMatchers("/swagger-ui/**").authenticated()
-                        .requestMatchers("/swagger-ui.html").authenticated()
-                        // Allow public usage of liveness
-                        .requestMatchers("/actuator/health/liveness").permitAll()
-                        .requestMatchers("/actuator/health/readiness").permitAll()
-                        // Allow authenticated usage of health
-                        .requestMatchers("/actuator/health/**").authenticated()
+                        // Allow public usage of OpenAPI-Specification
+                        .requestMatchers("/v3/api-docs*/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        // Allow public usage of health
+                        .requestMatchers("/actuator/health/**").permitAll()
                         // Deny anything else
                         .anyRequest().denyAll())
                 .oauth2Login(Customizer.withDefaults())
