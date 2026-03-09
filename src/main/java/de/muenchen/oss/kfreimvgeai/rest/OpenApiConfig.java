@@ -84,7 +84,7 @@ public class OpenApiConfig {
                         .clientCredentials(new OAuthFlow()
                                 .tokenUrl(tokenUrl)
                                 .scopes(new Scopes()
-                                        .addString("roles", "All client roles, including ANTRAG_READ, etc."))
+                                        .addString("roles", "All client roles, including [ANTRAG_READ], etc."))
                         )
                 );
 

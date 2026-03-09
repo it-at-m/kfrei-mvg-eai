@@ -73,7 +73,7 @@ public class AntragController {
     @Operation(
             summary = "Verify an Antrag",
             description = "Verifies that an Antrag with given information exists",
-            security = @SecurityRequirement(name = "oAuth2ClientCredentials")
+            security = @SecurityRequirement(name = OpenApiConfig.OAUTH2_SCHEME_NAME)
     )
     @ApiResponses(
             {
