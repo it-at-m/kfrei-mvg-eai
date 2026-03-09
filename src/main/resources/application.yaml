@@ -23,7 +23,7 @@ security:
       registration:
           # OAuth2 registration for accessing the KfreiRestApi
         kfrei-rest-api:
-          authorization-grant-type: ""
+          authorization-grant-type: client_credentials
           client-id: ""
           client-secret: ""
           # Requires: roles
