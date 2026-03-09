@@ -41,11 +41,11 @@ security:
           # Requires at least: roles
           scope: roles
 server:
-  port: 8081
+  port: 8080
   shutdown: graceful
 management:
   server:
-    port: 8082
+    port: 8081
   endpoints:
     web:
       exposure:
