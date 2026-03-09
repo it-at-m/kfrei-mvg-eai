@@ -231,6 +231,63 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <properties>
+                <image.name>${env.IMAGE_NAME}</image.name>
+            </properties>
+        </profile>
+        <profile>
+            <id>build-image</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <name>${image.name}:${project.version}</name>
+                                <verboseLogging>true</verboseLogging>
+                                <tags>${env.IMAGE_TAGS}</tags>
+                            </image>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-image</id>
+                                <goals>
+                                    <goal>build-image-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>publish</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <publish>true</publish>
+                            </image>
+                            <docker>
+                                <publishRegistry>
+                                    <username>${env.REGISTRY_USER}</username>
+                                    <password>${env.REGISTRY_TOKEN}</password>
+                                </publishRegistry>
+                            </docker>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <licenses>
         <license>
             <name>MIT License</name>
