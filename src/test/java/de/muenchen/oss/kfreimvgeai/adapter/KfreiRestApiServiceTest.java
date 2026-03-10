@@ -87,8 +87,7 @@ class KfreiRestApiServiceTest {
         assertEquals(LocalDate.of(2026, 12, 1), kfreiResponseDto.gueltigBis());
 
         WireMock.verify(
-                WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath))
-        );
+                WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath)));
     }
 
     @Test
@@ -109,8 +108,7 @@ class KfreiRestApiServiceTest {
                 () -> sut.existsAntrag(antragId, geburtsdatum, originUserName, requestId));
 
         WireMock.verify(
-                WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath))
-        );
+                WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath)));
     }
 
     @ParameterizedTest
@@ -132,8 +130,7 @@ class KfreiRestApiServiceTest {
                 () -> sut.existsAntrag(antragId, geburtsdatum, originUserName, requestId));
 
         WireMock.verify(
-                WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath))
-        );
+                WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath)));
     }
 
     static Stream<Arguments> provideSomeErrors() {
@@ -143,7 +140,6 @@ class KfreiRestApiServiceTest {
                 Arguments.of(WireMock.forbidden()),
                 Arguments.of(WireMock.notFound()),
                 Arguments.of(WireMock.serverError()),
-                Arguments.of(WireMock.serviceUnavailable())
-        );
+                Arguments.of(WireMock.serviceUnavailable()));
     }
 }

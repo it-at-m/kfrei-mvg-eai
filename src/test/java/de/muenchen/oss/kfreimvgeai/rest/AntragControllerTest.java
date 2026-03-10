@@ -87,18 +87,17 @@ class AntragControllerTest {
     void existsAntrag200AntragExistsTest() throws Exception {
         KfreiResponseDto kfreiResponseDto = new KfreiResponseDto(
                 LocalDate.of(2025, 12, 24),
-                LocalDate.of(2026, 12, 1)
-        );
+                LocalDate.of(2026, 12, 1));
 
         when(mKfreiRestApiService
                 .existsAntrag(eq(1337L), eq(LocalDate.of(2019, 12, 30)), eq("subject.mockito.user"), any()))
-                .thenReturn(kfreiResponseDto);
+                        .thenReturn(kfreiResponseDto);
 
         setupMockedJwtAuthorizedWithRole();
 
         mockMvc.perform(get("/api/v1/antraege/{antragId}/exists", 1337)
-                        .queryParam("geburtsdatum", "2019-12-30")
-                        .header("Authorization", "Bearer dummy-token"))
+                .queryParam("geburtsdatum", "2019-12-30")
+                .header("Authorization", "Bearer dummy-token"))
 
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(emptyString())))
@@ -117,8 +116,8 @@ class AntragControllerTest {
         setupMockedJwtAuthorizedWithRole();
 
         mockMvc.perform(get("/api/v1/antraege/{antragId}/exists", 1337)
-                        .queryParam("geburtsdatum", "2019-12-30d")
-                        .header("Authorization", "Bearer dummy-token"))
+                .queryParam("geburtsdatum", "2019-12-30d")
+                .header("Authorization", "Bearer dummy-token"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(not(emptyString())))
                 .andExpect(content().string("Invalid argument [propertyName=geburtsdatum, value=2019-12-30d]"));
@@ -130,13 +129,13 @@ class AntragControllerTest {
     void existsAntrag404AntragDoesNotExistTest() throws Exception {
         when(mKfreiRestApiService
                 .existsAntrag(eq(1337L), eq(LocalDate.of(2019, 12, 30)), eq("subject.mockito.user"), any()))
-                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "don't care", HttpHeaders.EMPTY, null, null));
+                        .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND, "don't care", HttpHeaders.EMPTY, null, null));
 
         setupMockedJwtAuthorizedWithRole();
 
         mockMvc.perform(get("/api/v1/antraege/{antragId}/exists", 1337)
-                        .queryParam("geburtsdatum", "2019-12-30")
-                        .header("Authorization", "Bearer dummy-token"))
+                .queryParam("geburtsdatum", "2019-12-30")
+                .header("Authorization", "Bearer dummy-token"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(emptyString()));
 
@@ -149,7 +148,7 @@ class AntragControllerTest {
     @Test
     void existsAntrag401UnauthorizedTest() throws Exception {
         mockMvc.perform(get("/api/v1/antraege/{antragId}/exists", 1337)
-                        .queryParam("geburtsdatum", "2019-12-30"))
+                .queryParam("geburtsdatum", "2019-12-30"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string(emptyString()));
 
@@ -161,8 +160,8 @@ class AntragControllerTest {
         setupMockedJwtAuthorizedWithUnauthorizedRole();
 
         mockMvc.perform(get("/api/v1/antraege/{antragId}/exists", 1337)
-                        .queryParam("geburtsdatum", "2019-12-30")
-                        .header("Authorization", "Bearer dummy-token"))
+                .queryParam("geburtsdatum", "2019-12-30")
+                .header("Authorization", "Bearer dummy-token"))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string(emptyString()));
 
@@ -176,11 +175,11 @@ class AntragControllerTest {
 
         when(mKfreiRestApiService
                 .existsAntrag(eq(1337L), eq(LocalDate.of(2019, 12, 30)), eq("subject.mockito.user"), any()))
-                .thenThrow(httpStatusCodeException);
+                        .thenThrow(httpStatusCodeException);
 
         mockMvc.perform(get("/api/v1/antraege/{antragId}/exists", 1337)
-                        .queryParam("geburtsdatum", "2019-12-30")
-                        .header("Authorization", "Bearer dummy-token"))
+                .queryParam("geburtsdatum", "2019-12-30")
+                .header("Authorization", "Bearer dummy-token"))
                 .andExpect(status().is5xxServerError())
                 .andExpect(content().string(emptyString()));
 
@@ -197,8 +196,7 @@ class AntragControllerTest {
                 Arguments.of(new HttpClientErrorException(HttpStatus.CONFLICT, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpServerErrorException(HttpStatus.SERVICE_UNAVAILABLE, "don't care", HttpHeaders.EMPTY, null, null)),
-                Arguments.of(new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED, "don't care", HttpHeaders.EMPTY, null, null))
-        );
+                Arguments.of(new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED, "don't care", HttpHeaders.EMPTY, null, null)));
     }
 
     void setupMockedJwtAuthorizedWithRole() {
@@ -211,10 +209,7 @@ class AntragControllerTest {
                         "sub", "subject.mockito.user",
                         "preferred_username", "mockito.user",
                         "resource_access", Map.of(
-                                "kfrei-mvg-eai", Map.of("roles", List.of("ANTRAG_READ"))
-                        )
-                )
-        );
+                                "kfrei-mvg-eai", Map.of("roles", List.of("ANTRAG_READ")))));
 
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }
@@ -229,10 +224,7 @@ class AntragControllerTest {
                         "sub", "subject.mockito.user",
                         "preferred_username", "mockito.user",
                         "resource_access", Map.of(
-                                "kfrei-mvg-eai", Map.of("roles", "DONT_CARE")
-                        )
-                )
-        );
+                                "kfrei-mvg-eai", Map.of("roles", "DONT_CARE"))));
 
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }

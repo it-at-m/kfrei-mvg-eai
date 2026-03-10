@@ -29,7 +29,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 /**
  * Main application class for the KfreiMvgEaiApplication.
  * <p>
- * This class serves as the entry point for the Spring Boot application, initializing the application context and launching the embedded server. It is
+ * This class serves as the entry point for the Spring Boot application, initializing the
+ * application context and launching the embedded server. It is
  * responsible for configuring the application and its components.
  *
  * @author felix.haala

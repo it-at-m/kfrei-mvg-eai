@@ -36,10 +36,10 @@ public interface KfreiRestApiServiceI {
     /**
      * This method checks the existence of an Antrag and provides metadata.
      *
-     * @param antragId       ID of the Antrag
-     * @param geburtsdatum   Geburtsdatum in the Antrag
+     * @param antragId ID of the Antrag
+     * @param geburtsdatum Geburtsdatum in the Antrag
      * @param originUserName Username from authentication, used for tracing
-     * @param requestId      Generated ID, used for tracing
+     * @param requestId Generated ID, used for tracing
      * @return {@link KfreiResponseDto} with metadata of the Antrag
      */
     KfreiResponseDto existsAntrag(long antragId, LocalDate geburtsdatum, String originUserName, String requestId);

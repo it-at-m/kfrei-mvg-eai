@@ -73,9 +73,11 @@ public class KfreiRestApiConfiguration {
     /**
      * Configures a RestClient for the KfreiRestApiService to enable OAuth2 authentication.
      *
-     * @param clientRegistrationRepository  the repository for managing client registrations for OAuth2
-     * @param oAuth2AuthorizedClientService the service for managing authorized OAuth2 clients and their tokens
-     * @param appConfigurationProperties    the application configuration properties used to customize the setup of the RestClient
+     * @param clientRegistrationRepository the repository for managing client registrations for OAuth2
+     * @param oAuth2AuthorizedClientService the service for managing authorized OAuth2 clients and their
+     *            tokens
+     * @param appConfigurationProperties the application configuration properties used to customize the
+     *            setup of the RestClient
      * @return the configured RestClient instance
      */
     @Bean
@@ -101,8 +103,7 @@ public class KfreiRestApiConfiguration {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestInterceptor(oauth2Interceptor)
-                .defaultRequest(request ->
-                        request.attributes(clientRegistrationId("kfrei-rest-api")))
+                .defaultRequest(request -> request.attributes(clientRegistrationId("kfrei-rest-api")))
                 .build();
     }
 
@@ -110,7 +111,8 @@ public class KfreiRestApiConfiguration {
      * Configures a RestClient for the KfreiRestApiService without security features.
      *
      * @param appConfigurationProperties the application configuration properties
-     * @return a RestClient instance configured for the KfreiRestApi without security features, ready for use in non-secure environments
+     * @return a RestClient instance configured for the KfreiRestApi without security features, ready
+     *         for use in non-secure environments
      */
     @Bean
     @Profile("!mock-kfreiRestApi & no-security")

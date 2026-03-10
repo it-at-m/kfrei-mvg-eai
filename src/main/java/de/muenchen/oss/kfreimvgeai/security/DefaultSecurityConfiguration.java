@@ -65,8 +65,7 @@ public class DefaultSecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth.anyRequest().hasAnyRole(KfreiMvgEaiRoles.getAll()))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(this.jwtAuthenticationConverter()))
-                );
+                                .jwtAuthenticationConverter(this.jwtAuthenticationConverter())));
         return http.build();
     }
 
@@ -125,9 +124,7 @@ public class DefaultSecurityConfiguration {
     SecurityFilterChain noSecurityFilterChain(HttpSecurity http) {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().permitAll()
-                ).build();
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()).build();
     }
 
 }

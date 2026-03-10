@@ -24,8 +24,10 @@ package de.muenchen.oss.kfreimvgeai;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles({ "no-security", "mock-kfreiRestApi" })
 class KfreiMvgEaiApplicationTests {
 
     @Test

@@ -59,28 +59,28 @@ public class OpenApiConfig {
             @Value("${app.swagger-ui.token-url:https://sso.example.com/auth/realms/example/protocol/openid-connect/token}") String tokenUrl) {
         SecurityScheme oauthScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.OAUTH2)
-                .description("""
-                        This API requires an access token issued by the SSO system.  The token must be sent in the HTTP Authorization header:
-                        
-                            Authorization: Bearer <access_token>
-                        
-                        Example: obtain a token using client credentials
-                        
-                            curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client-id:<client-id>" -d "client_secret=<client-secret>" -d "scope=roles"
-                        
-                        The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
-                        
-                            resource_access.<client-name>.roles
-                        
-                        You can also test the API directly by filling in the following information and authenticating yourself.
-                        """.formatted(tokenUrl))
+                .description(
+                        """
+                                This API requires an access token issued by the SSO system.  The token must be sent in the HTTP Authorization header:
+
+                                    Authorization: Bearer <access_token>
+
+                                Example: obtain a token using client credentials
+
+                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client-id:<client-id>" -d "client_secret=<client-secret>" -d "scope=roles"
+
+                                The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
+
+                                    resource_access.<client-name>.roles
+
+                                You can also test the API directly by filling in the following information and authenticating yourself.
+                                """
+                                .formatted(tokenUrl))
                 .flows(new OAuthFlows()
                         .clientCredentials(new OAuthFlow()
                                 .tokenUrl(tokenUrl)
                                 .scopes(new Scopes()
-                                        .addString("roles", "All client roles, including [ANTRAG_READ], etc."))
-                        )
-                );
+                                        .addString("roles", "All client roles, including [ANTRAG_READ], etc."))));
 
         return new OpenAPI()
                 .components(new Components()
