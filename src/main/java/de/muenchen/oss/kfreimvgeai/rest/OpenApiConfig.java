@@ -71,6 +71,8 @@ public class OpenApiConfig {
                         The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
                         
                             resource_access.<client-name>.roles
+                        
+                        You can also test the API directly by filling in the following information and authenticating yourself.
                         """.formatted(tokenUrl))
                 .flows(new OAuthFlows()
                         .clientCredentials(new OAuthFlow()
