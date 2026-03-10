@@ -31,7 +31,7 @@ import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.boot.security.oauth2.client.autoconfigure.OAuth2ClientProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -55,11 +55,8 @@ public class OpenApiConfig {
 
     @Bean
     @Profile("!no-security")
-    public OpenAPI customOpenAPI(OAuth2ClientProperties properties) {
-        String tokenUrl = properties.getProvider()
-                .get("kfrei-mvg-eai")
-                .getTokenUri();
-
+    public OpenAPI customOpenAPI(
+            @Value("${app.swagger-ui.token-url:https://sso.example.com/auth/realms/example/protocol/openid-connect/token}") String tokenUrl) {
         SecurityScheme oauthScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.OAUTH2)
                 .description("""
@@ -69,12 +66,7 @@ public class OpenApiConfig {
                         
                         Example: obtain a token using client credentials
                         
-                            curl -X POST %s \
-                              -H "Content-Type: application/x-www-form-urlencoded" \
-                              -d "grant_type=client_credentials" \
-                              -d "client-id:<client-id>" \
-                              -d "client_secret=<client-secret>"
-                              -d "scope=roles"
+                            curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client-id:<client-id>" -d "client_secret=<client-secret>" -d "scope=roles"
                         
                         The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
                         

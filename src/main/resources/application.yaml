@@ -41,6 +41,9 @@ management:
 app:
   kfrei-rest-api:
     base-url: http://localhost:8080/api/v2
+  swagger-ui:
+    # OAuth2 provider for accessing the kfrei-mvg-eai
+    token-url: ""
 springdoc:
   api-docs:
     enabled: true
