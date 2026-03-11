@@ -26,8 +26,8 @@ spring:
             authorization-grant-type: client_credentials
             client-id: example-id
             client-secret: example-secret
-            # Requires: roles
-            scope: roles
+            # Requires: openid,roles
+            scope: openid,roles
 server:
   port: 8081
   shutdown: graceful

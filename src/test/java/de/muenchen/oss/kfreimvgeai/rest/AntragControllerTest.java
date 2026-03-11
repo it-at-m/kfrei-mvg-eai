@@ -233,7 +233,7 @@ class AntragControllerTest {
                         "sub", "subject.mockito.user",
                         "preferred_username", "mockito.user",
                         "resource_access", Map.of(
-                                CLIENT_ID, Map.of("roles", "DONT_CARE"))));
+                                CLIENT_ID, Map.of("roles", List.of("DONT_CARE")))));
 
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }

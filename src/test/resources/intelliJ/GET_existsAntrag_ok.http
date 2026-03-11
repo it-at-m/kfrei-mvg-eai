@@ -1,6 +1,6 @@
 ## mock
   # antragId: 1111111111
-  # geburtsdatum: d1989-05-30
+  # geburtsdatum: 1989-05-30
   # note: Matching DTO in KfreiRestApiServiceMock results in a 200 OK response with the corresponding data.
   # return: berechtigungAb=2024-02-29, befristungBis=2024-12-29
 GET http://localhost:8081/api/v1/antraege/1111111111/exists?geburtsdatum=1989-11-30

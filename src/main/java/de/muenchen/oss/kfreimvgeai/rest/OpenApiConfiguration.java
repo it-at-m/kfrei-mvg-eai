@@ -71,7 +71,7 @@ public class OpenApiConfiguration {
 
                                 Example: obtain a token using client credentials
 
-                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" -d "scope=roles"
+                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" -d --data-urlencode "scope=openid roles"
 
                                 The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
 

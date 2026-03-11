@@ -113,7 +113,6 @@ public class DefaultSecurityConfiguration {
                         .requestMatchers("/actuator/health/**").permitAll()
                         // Deny anything else
                         .anyRequest().denyAll())
-                .oauth2Login(Customizer.withDefaults())
                 .build();
     }
 
