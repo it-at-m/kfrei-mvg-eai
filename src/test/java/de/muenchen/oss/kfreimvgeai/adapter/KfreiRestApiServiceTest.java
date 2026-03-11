@@ -72,7 +72,7 @@ class KfreiRestApiServiceTest {
 
         String requestPath = "/api/v2/antraege/1337/exists?geburtsdatum=2019-12-30";
         String responseJson = """
-                    { "gueltigAb": "2025-12-24", "gueltigBis": "2026-12-01" }
+                    { "berechtigungAb": "2025-12-24", "befristungBis": "2026-12-01" }
                 """;
         WireMock.stubFor(WireMock.get(requestPath)
                 .withHeader("x-origin-user-name", WireMock.equalTo(originUserName))
@@ -82,8 +82,8 @@ class KfreiRestApiServiceTest {
         KfreiResponseDto kfreiResponseDto = sut.existsAntrag(antragId, geburtsdatum, originUserName, requestId);
 
         assertNotNull(kfreiResponseDto);
-        assertEquals(LocalDate.of(2025, 12, 24), kfreiResponseDto.gueltigAb());
-        assertEquals(LocalDate.of(2026, 12, 1), kfreiResponseDto.gueltigBis());
+        assertEquals(LocalDate.of(2025, 12, 24), kfreiResponseDto.berechtigungAb());
+        assertEquals(LocalDate.of(2026, 12, 1), kfreiResponseDto.befristungBis());
 
         WireMock.verify(
                 WireMock.getRequestedFor(WireMock.urlEqualTo(requestPath)));

@@ -2,7 +2,7 @@
   # antragId: 1111111111
   # geburtsdatum: d1989-05-30
   # note: Matching DTO in KfreiRestApiServiceMock results in a 200 OK response with the corresponding data.
-  # return: gueltigAb=2024-02-29, gueltigBis=2024-12-29
+  # return: berechtigungAb=2024-02-29, befristungBis=2024-12-29
 GET http://localhost:8081/api/v1/antraege/1111111111/exists?geburtsdatum=1989-11-30
 Authorization: Bearer {{$auth.token("keycloak")}}
 
@@ -10,6 +10,6 @@ Authorization: Bearer {{$auth.token("keycloak")}}
   # antragId: 8
   # geburtsdatum: 2000-01-01
   # note: Matching DTO in Kfrei results in a 200 OK response with the corresponding data.
-  # return: gueltigAb=2022-09-01, gueltigBis=2023-07-31
+  # return: berechtigungAb=2022-09-01, befristungBis=2023-07-31
 #GET http://localhost:8081/api/v1/antraege/8/exists?geburtsdatum=2000-01-01
 #Authorization: Bearer {{$auth.token("keycloak")}}

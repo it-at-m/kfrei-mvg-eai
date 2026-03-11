@@ -29,6 +29,6 @@ import java.time.LocalDate;
  *
  * @author felix.haala
  */
-public record MvgResponseDto(LocalDate gueltigAb, LocalDate gueltigBis) {
+public record MvgResponseDto(LocalDate berechtigungAb, LocalDate befristungBis) {
 
 }

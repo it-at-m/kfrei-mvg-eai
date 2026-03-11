@@ -111,8 +111,8 @@ class AntragControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(emptyString())))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.gueltigAb").value("2025-12-24"))
-                .andExpect(jsonPath("$.gueltigBis").value("2026-12-01"));
+                .andExpect(jsonPath("$.berechtigungAb").value("2025-12-24"))
+                .andExpect(jsonPath("$.befristungBis").value("2026-12-01"));
 
         verify(mKfreiRestApiService, times(1))
                 .existsAntrag(eq(1337L), eq(LocalDate.of(2019, 12, 30)), eq("subject.mockito.user"), any());

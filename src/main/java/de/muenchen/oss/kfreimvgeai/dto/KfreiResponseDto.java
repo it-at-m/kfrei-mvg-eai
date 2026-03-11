@@ -29,6 +29,6 @@ import java.time.LocalDate;
  *
  * @author felix.haala
  */
-public record KfreiResponseDto(LocalDate gueltigAb, LocalDate gueltigBis) {
+public record KfreiResponseDto(LocalDate berechtigungAb, LocalDate befristungBis) {
 
 }
