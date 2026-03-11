@@ -57,7 +57,7 @@ public class OpenApiConfiguration {
     public static final String DEFAULT_TOKEN_URL = "https://sso.example.com/auth/realms/example/protocol/openid-connect/token";
 
     @Bean
-    @Profile("!no-security")
+    @Profile("!no-security-kfrei-mvg-eai")
     public OpenAPI customOpenAPI(AppConfigurationProperties appConfiguration) {
         String tokenUrl = StringUtils.defaultIfBlank(appConfiguration.getSwaggerUi().getTokenUrl(), DEFAULT_TOKEN_URL);
 

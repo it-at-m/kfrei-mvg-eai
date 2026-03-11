@@ -24,11 +24,16 @@ package de.muenchen.oss.kfreimvgeai;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
-@ActiveProfiles({ "no-security", "mock-kfrei-rest-api" })
+@ActiveProfiles({ "no-security-kfrei-mvg-eai", "no-security-kfrei-rest-api" })
 class KfreiMvgEaiApplicationTests {
+
+    @MockitoBean
+    ClientRegistrationRepository mClientRegistrationRepository;
 
     @Test
     void contextLoads() {

@@ -56,7 +56,7 @@ public class DefaultSecurityConfiguration {
      */
     @Bean
     @Order(1)
-    @Profile("!no-security")
+    @Profile("!no-security-kfrei-mvg-eai")
     SecurityFilterChain apiFilterChain(HttpSecurity http, AppConfigurationProperties appConfiguration) {
         http
                 .securityMatcher("/api/**")
@@ -98,7 +98,7 @@ public class DefaultSecurityConfiguration {
      */
     @Bean()
     @Order(2)
-    @Profile("!no-security")
+    @Profile("!no-security-kfrei-mvg-eai")
     SecurityFilterChain webFilterChain(HttpSecurity http) {
         return http
                 .securityMatcher("/**")
@@ -124,7 +124,7 @@ public class DefaultSecurityConfiguration {
      * @return the configured SecurityFilterChain
      */
     @Bean
-    @Profile("no-security")
+    @Profile("no-security-kfrei-mvg-eai")
     SecurityFilterChain noSecurityFilterChain(HttpSecurity http) {
         return http
                 .csrf(AbstractHttpConfigurer::disable)

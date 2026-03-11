@@ -25,20 +25,22 @@ package de.muenchen.oss.kfreimvgeai.rest;
 import de.muenchen.oss.kfreimvgeai.adapter.KfreiRestApiServiceI;
 import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import de.muenchen.oss.kfreimvgeai.mapper.DefaultMapperImpl;
+import de.muenchen.oss.kfreimvgeai.properties.AppConfigurationProperties;
 import de.muenchen.oss.kfreimvgeai.security.DefaultSecurityConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
@@ -70,10 +72,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @author felix.haala
  */
-@WebMvcTest(AntragController.class)
-@Import({ DefaultSecurityConfiguration.class, DefaultMapperImpl.class, DefaultExceptionHandler.class, ControllerTestConfiguration.class })
-@ActiveProfiles("mock-kfrei-rest-api")
+@WebMvcTest(
+        controllers = { AntragController.class },
+        properties = { "app.resourceserver.client-id=" + AntragControllerTest.CLIENT_ID }
+)
+@Import({ DefaultSecurityConfiguration.class, DefaultMapperImpl.class, DefaultExceptionHandler.class })
+@EnableConfigurationProperties({ AppConfigurationProperties.class })
 class AntragControllerTest {
+
+    public static final String CLIENT_ID = "kfrei-mvg-eai";
 
     @Autowired
     MockMvc mockMvc;
@@ -82,6 +89,8 @@ class AntragControllerTest {
     KfreiRestApiServiceI mKfreiRestApiService;
     @MockitoBean
     JwtDecoder mJwtDecoder;
+    @MockitoBean
+    ClientRegistrationRepository mClientRegistrationRepository;
 
     @Test
     void existsAntrag200AntragExistsTest() throws Exception {
@@ -209,7 +218,7 @@ class AntragControllerTest {
                         "sub", "subject.mockito.user",
                         "preferred_username", "mockito.user",
                         "resource_access", Map.of(
-                                "kfrei-mvg-eai", Map.of("roles", List.of("ANTRAG_READ")))));
+                                CLIENT_ID, Map.of("roles", List.of("ANTRAG_READ")))));
 
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }
@@ -224,7 +233,7 @@ class AntragControllerTest {
                         "sub", "subject.mockito.user",
                         "preferred_username", "mockito.user",
                         "resource_access", Map.of(
-                                "kfrei-mvg-eai", Map.of("roles", "DONT_CARE"))));
+                                CLIENT_ID, Map.of("roles", "DONT_CARE"))));
 
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }

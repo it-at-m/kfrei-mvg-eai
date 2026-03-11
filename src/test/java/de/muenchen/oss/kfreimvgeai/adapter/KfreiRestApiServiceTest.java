@@ -27,7 +27,6 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import de.muenchen.oss.kfreimvgeai.properties.AppConfigurationProperties;
-import de.muenchen.oss.kfreimvgeai.properties.KfreiRestApiConfigurationProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -57,8 +56,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         properties = { "app.kfrei-rest-api.base-url=http://localhost:8090/api/v2" }
 )
 @WireMockTest(httpPort = 8090)
-@ActiveProfiles({ "no-security" })
-@EnableConfigurationProperties({ AppConfigurationProperties.class, KfreiRestApiConfigurationProperties.class })
+@ActiveProfiles({ "no-security-kfrei-rest-api" })
+@EnableConfigurationProperties({ AppConfigurationProperties.class })
 class KfreiRestApiServiceTest {
 
     @Autowired
