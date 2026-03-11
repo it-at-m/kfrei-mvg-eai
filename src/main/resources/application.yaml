@@ -27,7 +27,9 @@ spring:
             client-id: example-id
             client-secret: example-secret
             # Requires: openid,roles
-            scope: openid,roles
+            scope: 
+              - openid
+              - roles
 server:
   port: 8081
   shutdown: graceful
@@ -37,7 +39,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: liveness,readiness
+        include:
+          - liveness
+          - readiness
 app:
   resourceserver:
     # OAuth2 client that holds the permission roles to verify
