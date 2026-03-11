@@ -22,6 +22,7 @@
  */
 package de.muenchen.oss.kfreimvgeai.security;
 
+import de.muenchen.oss.kfreimvgeai.properties.AppConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -56,7 +57,7 @@ public class DefaultSecurityConfiguration {
     @Bean
     @Order(1)
     @Profile("!no-security")
-    SecurityFilterChain apiFilterChain(HttpSecurity http) {
+    SecurityFilterChain apiFilterChain(HttpSecurity http, AppConfigurationProperties appConfiguration) {
         http
                 .securityMatcher("/api/**")
                 // Disable CSRF. API is stateless and uses token-based authentication (Authorization header)
@@ -65,7 +66,7 @@ public class DefaultSecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth.anyRequest().hasAnyRole(KfreiMvgEaiRoles.getAll()))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(this.jwtAuthenticationConverter())));
+                                .jwtAuthenticationConverter(this.jwtAuthenticationConverter(appConfiguration))));
         return http.build();
     }
 
@@ -74,8 +75,11 @@ public class DefaultSecurityConfiguration {
      *
      * @return the configured Converter
      */
-    private JwtAuthenticationConverter jwtAuthenticationConverter() {
-        Expression expression = new SpelExpressionParser().parseExpression("['resource_access']['kfrei-mvg-eai']['roles']");
+    private JwtAuthenticationConverter jwtAuthenticationConverter(AppConfigurationProperties appConfiguration) {
+        String clientId = appConfiguration.getResourceserver().getClientId();
+        String format = "['resource_access']['%s']['roles']".formatted(clientId);
+
+        Expression expression = new SpelExpressionParser().parseExpression(format);
 
         ExpressionJwtGrantedAuthoritiesConverter authoritiesConverter = new ExpressionJwtGrantedAuthoritiesConverter(expression);
         authoritiesConverter.setAuthorityPrefix("ROLE_");

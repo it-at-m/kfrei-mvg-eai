@@ -62,13 +62,21 @@ jobs:
           java-version: "21"
           distribution: "temurin"
           cache: "maven"
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=${{ github.event.inputs.release-version }}
+            ${{ inputs.latest-image ? 'type=raw,value=latest' : '' }}
       - name: Build image
         env:
           IMAGE_NAME: ghcr.io/${{ github.repository }}
           IMAGE_RAW_TAGS: ${{ steps.meta.outputs.tags }}
           REGISTRY_USER: ${{ github.repository_owner }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LATEST_TAG: ${{ (github.event.inputs.latest-image }}
+          LATEST_TAG: ${{ github.event.inputs.latest-image }}
         run: |
           export IMAGE_TAGS="${IMAGE_RAW_TAGS//$'\n'/,}"
           if [[ $LATEST_TAG = true ]]; then export IMAGE_TAGS=$IMAGE_TAGS,ghcr.io/it-at-m/kfrei-mvg-eai:latest; fi

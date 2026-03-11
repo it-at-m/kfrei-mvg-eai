@@ -1,6 +1,6 @@
 spring:
   profiles:
-    # Possible values are: logstash, no-security, mock-kfreiRestApi
+    # Possible values are: logstash, no-security, mock-kfrei-rest-api
     active:
   application:
     name: kfrei-mvg-eai
@@ -9,41 +9,44 @@ spring:
     error:
       whitelabel:
         enabled: false
-security:
-  oauth2:
-    # OAuth2 configuration for accessing the kfrei-mvg-eai
-    resourceserver:
-      jwt:
-        issuer-uri: ""
-    client:
-      provider:
-        # OAuth2 provider for accessing the KfreiRestApi
-        kfrei-rest-api:
-          issuer-uri: ""
-      registration:
-          # OAuth2 registration for accessing the KfreiRestApi
-        kfrei-rest-api:
-          authorization-grant-type: client_credentials
-          client-id: ""
-          client-secret: ""
-          # Requires: roles
-          scope: roles
+  security:
+    oauth2:
+      # OAuth2 configuration for accessing the kfrei-mvg-eai
+      resourceserver:
+        jwt:
+          issuer-uri: https://sso.example.com/auth/realms/example
+      client:
+        provider:
+          # OAuth2 provider for accessing the KfreiRestApi
+          kfrei-rest-api:
+            issuer-uri: https://sso.example.com/auth/realms/example
+        registration:
+            # OAuth2 registration for accessing the KfreiRestApi
+          kfrei-rest-api:
+            authorization-grant-type: client_credentials
+            client-id: example-id
+            client-secret: example-secret
+            # Requires: roles
+            scope: roles
 server:
-  port: 8080
+  port: 8081
   shutdown: graceful
 management:
   server:
-    port: 8081
+    port: 8082
   endpoints:
     web:
       exposure:
         include: liveness,readiness
 app:
+  resourceserver:
+    # OAuth2 client that holds the permission roles to verify
+    client-id: example-id
   kfrei-rest-api:
     base-url: http://localhost:8080/api/v2
   swagger-ui:
     # OAuth2 provider for accessing the kfrei-mvg-eai
-    token-url: ""
+    token-url: https://sso.example.com/auth/realms/example/protocol/openid-connect/token
 springdoc:
   api-docs:
     enabled: true

@@ -72,7 +72,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(AntragController.class)
 @Import({ DefaultSecurityConfiguration.class, DefaultMapperImpl.class, DefaultExceptionHandler.class, ControllerTestConfiguration.class })
-@ActiveProfiles("mock-kfreiRestApi")
+@ActiveProfiles("mock-kfrei-rest-api")
 class AntragControllerTest {
 
     @Autowired

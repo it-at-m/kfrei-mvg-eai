@@ -21,6 +21,14 @@ jobs:
           java-version: "21"
           distribution: "temurin"
           cache: "maven"
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha
+            type=ref,event=branch
       - name: Build with Maven
         env:
           IMAGE_NAME: ghcr.io/${{ github.repository }}

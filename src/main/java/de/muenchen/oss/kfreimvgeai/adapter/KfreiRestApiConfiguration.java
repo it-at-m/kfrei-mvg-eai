@@ -52,7 +52,7 @@ public class KfreiRestApiConfiguration {
      * @return a configured instance of KfreiRestApiService
      */
     @Bean
-    @Profile("!mock-kfreiRestApi")
+    @Profile("!mock-kfrei-rest-api")
     KfreiRestApiService kfreiRestApiService(RestClient restClient) {
         log.info("Initializing KfreiRestApiService");
         return new KfreiRestApiService(restClient);
@@ -64,7 +64,7 @@ public class KfreiRestApiConfiguration {
      * @return a configured instance of KfreiRestApiServiceMock ready for use in tests
      */
     @Bean
-    @Profile("mock-kfreiRestApi")
+    @Profile("mock-kfrei-rest-api")
     KfreiRestApiServiceMock kfreiRestApiServiceMock() {
         log.info("Initializing KfreiRestApiServiceMock");
         return new KfreiRestApiServiceMock();
@@ -81,7 +81,7 @@ public class KfreiRestApiConfiguration {
      * @return the configured RestClient instance
      */
     @Bean
-    @Profile("!mock-kfreiRestApi & !no-security")
+    @Profile("!mock-kfrei-rest-api & !no-security")
     RestClient kfreiRestApirestClient(ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientService oAuth2AuthorizedClientService,
             AppConfigurationProperties appConfigurationProperties) {
@@ -115,7 +115,7 @@ public class KfreiRestApiConfiguration {
      *         for use in non-secure environments
      */
     @Bean
-    @Profile("!mock-kfreiRestApi & no-security")
+    @Profile("!mock-kfrei-rest-api & no-security")
     RestClient kfreiRestApirestClientNoSecurity(AppConfigurationProperties appConfigurationProperties) {
         String baseUrl = appConfigurationProperties.getKfreiRestApi().getBaseUrl();
         log.info("Initializing RestClient without security configuration [baseUrl={}]", baseUrl);

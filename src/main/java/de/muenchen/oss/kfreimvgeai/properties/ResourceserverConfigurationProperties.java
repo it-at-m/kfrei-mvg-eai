@@ -20,18 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.muenchen.oss.kfreimvgeai;
+package de.muenchen.oss.kfreimvgeai.properties;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@SpringBootTest
-@ActiveProfiles({ "no-security", "mock-kfrei-rest-api" })
-class KfreiMvgEaiApplicationTests {
+/**
+ * Configuration properties for the OAuth2 Resourceserver.
+ *
+ * @author felix.haala
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@ConfigurationProperties(prefix = "app.resourceserver")
+public class ResourceserverConfigurationProperties {
 
-    @Test
-    void contextLoads() {
-    }
+    private String clientId;
 
 }

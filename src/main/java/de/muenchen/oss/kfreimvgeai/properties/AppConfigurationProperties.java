@@ -40,6 +40,12 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 public class AppConfigurationProperties {
 
     @NestedConfigurationProperty
+    private ResourceserverConfigurationProperties resourceserver;
+
+    @NestedConfigurationProperty
     private KfreiRestApiConfigurationProperties kfreiRestApi;
+
+    @NestedConfigurationProperty
+    private SwaggerUiConfigurationProperties swaggerUi;
 
 }

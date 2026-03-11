@@ -74,8 +74,8 @@ public class AntragController {
             summary = "Verify an Antrag",
             description = "Verifies that an Antrag with given information exists",
             security = @SecurityRequirement(
-                    name = OpenApiConfig.OAUTH2_SCHEME_NAME,
-                    scopes = { "ANTRAG_READ" }
+                    name = OpenApiConfiguration.OAUTH2_SCHEME_NAME,
+                    scopes = { KfreiMvgEaiRoles.ANTRAG_READ }
             )
     )
     @ApiResponses(
@@ -130,12 +130,12 @@ public class AntragController {
             KfreiResponseDto kfreiResponseDto = kfreiRestApiService.existsAntrag(antragId, geburtsdatum, originUserName, requestId);
             MvgResponseDto mvgResponseDto = this.mapper.kfreiResponseDtoToMvgResponseDto(kfreiResponseDto);
 
-            log.debug("Antrag found, returning info [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
+            log.info("Antrag found, returning info [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                     antragId, geburtsdatum, originUserName, requestId);
             return ResponseEntity.ok(mvgResponseDto);
         } catch (RestClientResponseException ex) {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                log.debug("Antrag not found [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
+                log.info("Antrag not found [antragId={}, geburtsdatum={}, request=[originUserName={}, requestId={}]]",
                         antragId, geburtsdatum, originUserName, requestId);
                 return ResponseEntity.notFound().build();
             }

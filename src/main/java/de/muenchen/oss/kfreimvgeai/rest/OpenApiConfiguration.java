@@ -22,6 +22,8 @@
  */
 package de.muenchen.oss.kfreimvgeai.rest;
 
+import de.muenchen.oss.kfreimvgeai.properties.AppConfigurationProperties;
+import de.muenchen.oss.kfreimvgeai.security.KfreiMvgEaiRoles;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;
@@ -31,7 +33,7 @@ import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -49,14 +51,16 @@ import org.springframework.context.annotation.Profile;
                 description = "REST API for communicating with kfrei-mvg-eai."
         )
 )
-public class OpenApiConfig {
+public class OpenApiConfiguration {
 
     public static final String OAUTH2_SCHEME_NAME = "oAuth2ClientCredentials";
+    public static final String DEFAULT_TOKEN_URL = "https://sso.example.com/auth/realms/example/protocol/openid-connect/token";
 
     @Bean
     @Profile("!no-security")
-    public OpenAPI customOpenAPI(
-            @Value("${app.swagger-ui.token-url:https://sso.example.com/auth/realms/example/protocol/openid-connect/token}") String tokenUrl) {
+    public OpenAPI customOpenAPI(AppConfigurationProperties appConfiguration) {
+        String tokenUrl = StringUtils.defaultIfBlank(appConfiguration.getSwaggerUi().getTokenUrl(), DEFAULT_TOKEN_URL);
+
         SecurityScheme oauthScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.OAUTH2)
                 .description(
@@ -67,7 +71,7 @@ public class OpenApiConfig {
 
                                 Example: obtain a token using client credentials
 
-                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client-id:<client-id>" -d "client_secret=<client-secret>" -d "scope=roles"
+                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" -d "scope=roles"
 
                                 The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
 
@@ -80,7 +84,7 @@ public class OpenApiConfig {
                         .clientCredentials(new OAuthFlow()
                                 .tokenUrl(tokenUrl)
                                 .scopes(new Scopes()
-                                        .addString("roles", "All client roles, including [ANTRAG_READ], etc."))));
+                                        .addString(KfreiMvgEaiRoles.ANTRAG_READ, "Read access to Anträge endpoints"))));
 
         return new OpenAPI()
                 .components(new Components()
