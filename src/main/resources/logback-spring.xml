@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+
     <springProfile name="!logstash">
-        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+        <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
     </springProfile>
 
     <springProfile name="logstash">
-        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
                 <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
                     <!-- default max size of one log line in docker is 16kb - UTF8 ~ 1 Character = 1 Byte -->
@@ -18,5 +21,9 @@
             </encoder>
         </appender>
     </springProfile>
-    
+
+    <root>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
 </configuration>

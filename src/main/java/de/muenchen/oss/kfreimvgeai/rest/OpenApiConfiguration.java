@@ -71,7 +71,7 @@ public class OpenApiConfiguration {
 
                                 Example: obtain a token using client credentials
 
-                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" -d --data-urlencode "scope=openid roles"
+                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" --data-urlencode "scope=openid roles"
 
                                 The token will include all client roles assigned to your application. Specific roles, such as [ANTRAG_READ], can be found in the token claim:
 
@@ -84,7 +84,8 @@ public class OpenApiConfiguration {
                         .clientCredentials(new OAuthFlow()
                                 .tokenUrl(tokenUrl)
                                 .scopes(new Scopes()
-                                        .addString(KfreiMvgEaiRoles.ANTRAG_READ, "Read access to Anträge endpoints"))));
+                                        .addString("openid", "OpenID Connect scope")
+                                        .addString("roles", "Include assigned client roles in the token"))));
 
         return new OpenAPI()
                 .components(new Components()

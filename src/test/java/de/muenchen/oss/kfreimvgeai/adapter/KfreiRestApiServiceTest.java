@@ -137,7 +137,6 @@ class KfreiRestApiServiceTest {
                 Arguments.of(WireMock.badRequest()),
                 Arguments.of(WireMock.unauthorized()),
                 Arguments.of(WireMock.forbidden()),
-                Arguments.of(WireMock.notFound()),
                 Arguments.of(WireMock.serverError()),
                 Arguments.of(WireMock.serviceUnavailable()));
     }

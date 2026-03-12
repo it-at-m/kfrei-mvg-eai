@@ -9,23 +9,28 @@ spring:
     error:
       whitelabel:
         enabled: false
+  http:
+    clients:
+      # Default timeouts for Spring RestClient calls
+      connect-timeout: PT10S
+      read-timeout: PT10S
   security:
     oauth2:
       # OAuth2 configuration for accessing the kfrei-mvg-eai
       resourceserver:
         jwt:
-          issuer-uri: https://sso.example.com/auth/realms/example
+          issuer-uri: # example: https://sso.example.com/auth/realms/example
       client:
         provider:
           # OAuth2 provider for accessing the KfreiRestApi
           kfrei-rest-api:
-            issuer-uri: https://sso.example.com/auth/realms/example
+            issuer-uri: # example: https://sso.example.com/auth/realms/example
         registration:
             # OAuth2 registration for accessing the KfreiRestApi
           kfrei-rest-api:
             authorization-grant-type: client_credentials
-            client-id: example-id
-            client-secret: example-secret
+            client-id: # example-id
+            client-secret: # example-secret
             # Requires: openid,roles
             scope: 
               - openid
@@ -35,29 +40,32 @@ server:
   shutdown: graceful
 management:
   server:
+    # Isolate operational endpoints from the main application traffic
     port: 8082
   endpoints:
     web:
       exposure:
-        include:
-          - liveness
-          - readiness
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
 app:
   resourceserver:
     # OAuth2 client that holds the permission roles to verify
     client-id: example-id
   kfrei-rest-api:
-    base-url: http://localhost:8080/api/v2
+    base-url: # example: http://localhost:8080/api/v2
   swagger-ui:
     # OAuth2 provider for accessing the kfrei-mvg-eai
-    token-url: https://sso.example.com/auth/realms/example/protocol/openid-connect/token
+    token-url: # example: https://sso.example.com/auth/realms/example/protocol/openid-connect/token
 springdoc:
   api-docs:
     enabled: true
   swagger-ui:
     enabled: true
   packages-to-scan: de.muenchen.oss.kfreimvgeai.rest
-  pathsToMatch: /api/v1/**
+  paths-to-match: /api/v1/**
 logging:
   level:
     de.muenchen.oss: INFO

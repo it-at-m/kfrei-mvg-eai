@@ -99,7 +99,7 @@ public class AntragController {
                         content = @Content(
                                 mediaType = "text/plain",
                                 schema = @Schema(type = "string"),
-                                examples = @ExampleObject("Invalid argument [propertyName=%s, value=%s]")
+                                examples = @ExampleObject("Invalid argument [propertyName=%s]")
                         )
                 ),
                 @ApiResponse(

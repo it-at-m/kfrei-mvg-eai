@@ -111,6 +111,8 @@ public class DefaultSecurityConfiguration {
                         .requestMatchers("/swagger-ui.html").permitAll()
                         // Allow public usage of health
                         .requestMatchers("/actuator/health/**").permitAll()
+                        // Allow public usage of info
+                        .requestMatchers("/actuator/info").permitAll()
                         // Deny anything else
                         .anyRequest().denyAll())
                 .build();

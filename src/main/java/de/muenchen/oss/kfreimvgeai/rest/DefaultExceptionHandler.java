@@ -46,7 +46,7 @@ public class DefaultExceptionHandler {
      */
     @ExceptionHandler(TypeMismatchException.class)
     public ResponseEntity<String> handleTypeMismatchException(TypeMismatchException ex) {
-        String message = "Invalid argument [propertyName=%s, value=%s]".formatted(ex.getPropertyName(), ex.getValue());
+        String message = "Invalid argument [propertyName=%s]".formatted(ex.getPropertyName());
         log.warn(message);
         return ResponseEntity.badRequest().body(message);
     }

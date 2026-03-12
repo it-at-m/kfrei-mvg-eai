@@ -82,7 +82,7 @@ public class KfreiRestApiConfiguration {
      */
     @Bean
     @Profile("!mock-kfrei-rest-api & !no-security-kfrei-rest-api")
-    RestClient kfreiRestApirestClient(ClientRegistrationRepository clientRegistrationRepository,
+    RestClient kfreiRestApiRestClient(ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientService oAuth2AuthorizedClientService,
             AppConfigurationProperties appConfigurationProperties) {
         var manager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
@@ -116,7 +116,7 @@ public class KfreiRestApiConfiguration {
      */
     @Bean
     @Profile("!mock-kfrei-rest-api & no-security-kfrei-rest-api")
-    RestClient kfreiRestApirestClientNoSecurity(AppConfigurationProperties appConfigurationProperties) {
+    RestClient kfreiRestApiRestClientNoSecurity(AppConfigurationProperties appConfigurationProperties) {
         String baseUrl = appConfigurationProperties.getKfreiRestApi().getBaseUrl();
         log.info("Initializing RestClient without security configuration [baseUrl={}]", baseUrl);
 

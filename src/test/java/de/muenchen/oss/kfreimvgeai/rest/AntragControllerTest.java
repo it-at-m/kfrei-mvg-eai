@@ -129,7 +129,7 @@ class AntragControllerTest {
                 .header("Authorization", "Bearer dummy-token"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(not(emptyString())))
-                .andExpect(content().string("Invalid argument [propertyName=geburtsdatum, value=2019-12-30d]"));
+                .andExpect(content().string("Invalid argument [propertyName=geburtsdatum]"));
 
         verifyNoInteractions(mKfreiRestApiService);
     }
@@ -200,9 +200,9 @@ class AntragControllerTest {
 
     static Stream<Arguments> provideSomeErrors() {
         return Stream.of(
-                Arguments.of(new HttpClientErrorException(HttpStatus.BAD_GATEWAY, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpClientErrorException(HttpStatus.METHOD_NOT_ALLOWED, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpClientErrorException(HttpStatus.CONFLICT, "don't care", HttpHeaders.EMPTY, null, null)),
+                Arguments.of(new HttpServerErrorException(HttpStatus.BAD_GATEWAY, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpServerErrorException(HttpStatus.SERVICE_UNAVAILABLE, "don't care", HttpHeaders.EMPTY, null, null)),
                 Arguments.of(new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED, "don't care", HttpHeaders.EMPTY, null, null)));
