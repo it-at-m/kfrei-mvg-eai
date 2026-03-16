@@ -22,10 +22,12 @@
  */
 package de.muenchen.oss.kfreimvgeai.properties;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Configuration properties for the OAuth2 Resourceserver.
@@ -35,9 +37,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @NoArgsConstructor
+@Validated
 @ConfigurationProperties(prefix = "app.resourceserver")
 public class ResourceserverConfigurationProperties {
 
+    @NotBlank
     private String clientId;
 
 }

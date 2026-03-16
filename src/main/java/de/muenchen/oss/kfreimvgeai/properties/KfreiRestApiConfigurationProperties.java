@@ -22,10 +22,13 @@
  */
 package de.muenchen.oss.kfreimvgeai.properties;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Configuration properties for the KfreiRestApiService.
@@ -35,9 +38,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Getter
 @Setter
 @NoArgsConstructor
+@Validated
 @ConfigurationProperties(prefix = "app.kfrei-rest-api")
 public class KfreiRestApiConfigurationProperties {
 
+    @URL
+    @NotBlank
     private String baseUrl;
 
 }

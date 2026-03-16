@@ -41,7 +41,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
@@ -50,6 +49,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -210,22 +210,17 @@ class AntragControllerTest {
     }
 
     void setupMockedJwtAuthorizedWithRole() {
-        Jwt mockJwt = new Jwt(
-                "dummy-token",
-                Instant.now(),
-                Instant.now().plusSeconds(3600),
-                Map.of("alg", "none"),
-                Map.of(
-                        "sub", "subject.mockito.user",
-                        "preferred_username", "mockito.user",
-                        "resource_access", Map.of(
-                                CLIENT_ID, Map.of("roles", List.of("ANTRAG_READ")))));
-
+        Jwt mockJwt = setupMockedJwtWithRoles(List.of("ANTRAG_READ"));
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }
 
     void setupMockedJwtAuthorizedWithUnauthorizedRole() {
-        Jwt mockJwt = new Jwt(
+        Jwt mockJwt = setupMockedJwtWithRoles(List.of("DONT_CARE"));
+        when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
+    }
+
+    Jwt setupMockedJwtWithRoles(Collection<String> resourceAccess) {
+        return new Jwt(
                 "dummy-token",
                 Instant.now(),
                 Instant.now().plusSeconds(3600),
@@ -234,9 +229,7 @@ class AntragControllerTest {
                         "sub", "subject.mockito.user",
                         "preferred_username", "mockito.user",
                         "resource_access", Map.of(
-                                CLIENT_ID, Map.of("roles", List.of("DONT_CARE")))));
-
-        when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
+                                CLIENT_ID, Map.of("roles", resourceAccess))));
     }
 
 }

@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Configuration properties for the application kfrei-mvg-eai.
@@ -36,6 +37,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 @Getter
 @Setter
 @NoArgsConstructor
+@Validated
 @ConfigurationProperties(prefix = "app")
 public class AppConfigurationProperties {
 
