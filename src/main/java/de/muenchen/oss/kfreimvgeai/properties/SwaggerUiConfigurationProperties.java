@@ -22,13 +22,10 @@
  */
 package de.muenchen.oss.kfreimvgeai.properties;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
 
 /**
  * Configuration properties for the Swagger UI - REST API Documentation Tool.
@@ -38,12 +35,9 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 @NoArgsConstructor
-@Validated
 @ConfigurationProperties(prefix = "app.swagger-ui")
 public class SwaggerUiConfigurationProperties {
 
-    @URL
-    @NotBlank
     private String tokenUrl;
 
 }
