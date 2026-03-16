@@ -3,7 +3,7 @@
 [![Made with love by it@M][made-with-love-shield]][itm-opensource]
 <!-- feel free to add more shields, style 'for-the-badge' -> see https://shields.io/badges -->
 
-EAI component for communication between MVG (Münchner Verkehrsgesellschaft) and Kfrei (Kostenfreiheit des Schulwegs).
+EAI component for communication between MVG (Münchner Verkehrsgesellschaft) and KFrei (Kostenfreiheit des Schulwegs).
 
 ### Built With
 
@@ -36,8 +36,7 @@ spring.security.oauth2.client.registration.kfrei-rest-api.client-id=example-id
 spring.security.oauth2.client.registration.kfrei-rest-api.client-secret=example-secret
 ```
 
-Alternatively, you can run the EAI component with the following profiles to disable security and use a mocked backend application. These options allow you
-to test the project without security restrictions or with a mock setup.
+Alternatively, you can run the EAI component with the following profiles to disable security and use a mocked backend application.
 
 * `no-security-kfrei-mvg-eai`: Disables security for the EAI component.
 * `no-security-kfrei-rest-api`: Disables security for the REST client connecting to the backend application.
@@ -45,17 +44,17 @@ to test the project without security restrictions or with a mock setup.
 
 You can expect the following behavior when using `KfreiRestApiServiceMock`:
 
-| HTTP-Request | Parameter                                     | Reponse Code | Content                                             | Note                                                   |
-|--------------|-----------------------------------------------|--------------|-----------------------------------------------------|--------------------------------------------------------|
-| GET          | antragId=1111111111, geburtsdatum=1989-11-30  | 200          | berechtigungAb=2024-02-29, befristungBis=2024-12-29 |                                                        |
-| GET          | antragId=2222222222, geburtsdatum=1989-02-28  | 200          | berechtigungAb=2025-02-28, befristungBis=2025-12-28 |                                                        |
-| GET          | antragId=3333333333, geburtsdatum=1989-09-30  | 200          | berechtigungAb=2026-01-30, befristungBis=2026-12-31 |                                                        |
-| GET          | antragId=4444444444, geburtsdatum=1989-10-31  | 200          | berechtigungAb=2027-01-30, befristungBis=2027-12-31 |                                                        |
-| GET          |                                               | 404          | none                                                | Any other combination of `antragId` and `geburtsdatum` |
-| GET          | antragId=1111111111, geburtsdatum=d1989-11-30 | 404          | Invalid argument [propertyName=geburtsdatum]        | Wrong format in `geburtsdatum`                         |
-| GET          | antragId=0                                    | 500          | none                                                | Simulates Internal Server Error in backend application |
+| HTTP Method | Parameters                                    | Reponse Code | Content                                             | Note                                                   |
+|-------------|-----------------------------------------------|--------------|-----------------------------------------------------|--------------------------------------------------------|
+| GET         | antragId=1111111111, geburtsdatum=1989-11-30  | 200          | berechtigungAb=2024-02-29, befristungBis=2024-12-29 |                                                        |
+| GET         | antragId=2222222222, geburtsdatum=1989-02-28  | 200          | berechtigungAb=2025-02-28, befristungBis=2025-12-28 |                                                        |
+| GET         | antragId=3333333333, geburtsdatum=1989-09-30  | 200          | berechtigungAb=2026-01-30, befristungBis=2026-12-31 |                                                        |
+| GET         | antragId=4444444444, geburtsdatum=1989-10-31  | 200          | berechtigungAb=2027-01-30, befristungBis=2027-12-31 |                                                        |
+| GET         |                                               | 404          | none                                                | Any other combination of `antragId` and `geburtsdatum` |
+| GET         | antragId=1111111111, geburtsdatum=d1989-11-30 | 404          | Invalid argument [propertyName=geburtsdatum]        | Wrong format in `geburtsdatum`                         |
+| GET         | antragId=0                                    | 500          | none                                                | Simulates Internal Server Error in backend application |
 
-You can access the Swagger OpenAPI documentation at http://localhost:8081/swagger-ui.html.
+The Swagger OpenAPI documentation can be accessed at http://localhost:8081/swagger-ui.html while the EAI component is running.
 
 ## Documentation
 
