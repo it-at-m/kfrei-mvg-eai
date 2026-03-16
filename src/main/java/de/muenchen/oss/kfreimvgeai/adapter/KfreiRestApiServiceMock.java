@@ -70,7 +70,7 @@ public class KfreiRestApiServiceMock implements KfreiRestApiServiceI {
         }
         // Vorjahr
         if (antragId == 2222222222L && geburtsdatum.isEqual(LocalDate.of(1989, 2, 28))) {
-            new KfreiResponseDto(LocalDate.of(2025, 2, 28), LocalDate.of(2025, 12, 28));
+            return new KfreiResponseDto(LocalDate.of(2025, 2, 28), LocalDate.of(2025, 12, 28));
         }
         // Aktuelles Jahr
         if (antragId == 3333333333L && geburtsdatum.isEqual(LocalDate.of(1989, 9, 30))) {
