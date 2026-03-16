@@ -27,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      BP_SPRING_CLOUD_BINDINGS_ENABLED: false
+      BPL_JVM_MEMORY_CALCULATOR_ENABLED: false
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v6

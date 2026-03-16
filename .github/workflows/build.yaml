@@ -12,6 +12,9 @@ jobs:
     permissions:
       packages: write
       contents: read
+    env:
+      BP_SPRING_CLOUD_BINDINGS_ENABLED: false
+      BPL_JVM_MEMORY_CALCULATOR_ENABLED: false
     steps:
       - uses: actions/checkout@v6
       - name: Inject slug/short variables
