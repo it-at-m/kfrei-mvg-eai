@@ -1,0 +1,101 @@
+name: release
+
+# Run workflow on commits to the `main` branch
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to release from"
+        required: true
+        default: "main"
+      release-version:
+        description: "Version for the release"
+        required: true
+      release-tag:
+        description: "Tag for the release"
+        required: true
+      development-version:
+        description: "Next development version"
+        required: true
+      latest-image:
+        description: "Tag image as 'latest'"
+        required: true
+        default: true
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - name: Setup git user
+        uses: fregante/setup-git-user@v2
+      - name: Install Java and Maven
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: "temurin"
+      - name: Perform maven release
+        run: >
+          mvn -B -ntp release:prepare 
+          -DreleaseVersion=${{ github.event.inputs.release-version }} 
+          -DdevelopmentVersion=${{ github.event.inputs.development-version }} 
+          -Dtag=${{ github.event.inputs.release-tag }} 
+          -Darguments="-DskipTests"
+
+  publish-image:
+    needs: prepare-release
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+    steps:
+      - name: checkout release tag
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.inputs.release-tag }}
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: "maven"
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=${{ github.event.inputs.release-version }}
+            ${{ inputs.latest-image && 'type=raw,value=latest' || '' }}
+      - name: Build image
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}
+          IMAGE_RAW_TAGS: ${{ steps.meta.outputs.tags }}
+          REGISTRY_USER: ${{ github.repository_owner }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LATEST_TAG: ${{ github.event.inputs.latest-image }}
+        run: |
+          export IMAGE_TAGS="${IMAGE_RAW_TAGS//$'\n'/,}"
+          if [[ $LATEST_TAG = true ]]; then export IMAGE_TAGS=$IMAGE_TAGS,ghcr.io/it-at-m/kfrei-mvg-eai:latest; fi
+          mvn -B -ntp -DskipTests -P ci,build-image,publish verify
+  
+  github-release:
+    needs: ["publish-image"]
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+    steps:
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            target/*.jar
+          tag_name: ${{ github.event.inputs.release-tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
