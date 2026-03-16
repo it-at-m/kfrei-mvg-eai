@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KfreiMvgEaiRoles {
 
-    public static final String ANTRAG_READ = "ANTRAG_READ";
+    public static final String ANTRAG_READ = "antragread";
 
     /**
      * Returns an array of all known roles.

@@ -27,6 +27,7 @@ import de.muenchen.oss.kfreimvgeai.dto.KfreiResponseDto;
 import de.muenchen.oss.kfreimvgeai.mapper.DefaultMapperImpl;
 import de.muenchen.oss.kfreimvgeai.properties.AppConfigurationProperties;
 import de.muenchen.oss.kfreimvgeai.security.DefaultSecurityConfiguration;
+import de.muenchen.oss.kfreimvgeai.security.KfreiMvgEaiRoles;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -210,7 +211,7 @@ class AntragControllerTest {
     }
 
     void setupMockedJwtAuthorizedWithRole() {
-        Jwt mockJwt = setupMockedJwtWithRoles(List.of("ANTRAG_READ"));
+        Jwt mockJwt = setupMockedJwtWithRoles(List.of(KfreiMvgEaiRoles.ANTRAG_READ));
         when(mJwtDecoder.decode(any())).thenReturn(mockJwt);
     }
 
