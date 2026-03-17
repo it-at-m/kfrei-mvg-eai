@@ -1,6 +1,6 @@
 spring:
   profiles:
-    # Possible values are: logstash, no-security-kfrei-mvg-eai, no-security-kfrei-rest-api, mock-kfrei-rest-api
+    # Possible values are: logstash, mock-kfrei-rest-api, no-security-kfrei-mvg-eai, no-security-kfrei-rest-api
     active:
   application:
     name: kfrei-mvg-eai

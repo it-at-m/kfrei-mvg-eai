@@ -73,10 +73,7 @@ public class AntragController {
     @Operation(
             summary = "Verify an Antrag",
             description = "Verifies that an Antrag with given information exists",
-            security = @SecurityRequirement(
-                    name = OpenApiConfiguration.OAUTH2_SCHEME_NAME,
-                    scopes = { KfreiMvgEaiRoles.ANTRAG_READ }
-            )
+            security = @SecurityRequirement(name = OpenApiConfiguration.SCHEME_NAME)
     )
     @ApiResponses(
         {
