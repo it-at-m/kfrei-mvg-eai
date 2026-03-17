@@ -51,7 +51,7 @@ jobs:
           distribution: temurin
           # For Maven Distribution Management
           server-id: github
-          server-username: ${{ github.repository_owner }}
+          server-username: ${{ github.actor }}
           server-password: ${{ secrets.GITHUB_TOKEN }}
       
       # Run the full Maven release lifecycle:
