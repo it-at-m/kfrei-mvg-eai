@@ -241,6 +241,7 @@
     </build>
 
     <profiles>
+        <!-- Base container configuration -->
         <profile>
             <id>container</id>
             <build>
@@ -253,7 +254,6 @@
                                 <name>${image.name}:${image.tag.primary}</name>
                                 <tags>
                                     <tag>${image.tag.sha}</tag>
-                                    <tag>${image.tag.optional}</tag>
                                 </tags>
                                 <publish>true</publish>
                             </image>
@@ -271,6 +271,25 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Add latest tag -->
+        <profile>
+            <id>container-latest</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <tags combine.children="append">
+                                    <tag>latest</tag>
+                                </tags>
+                            </image>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
