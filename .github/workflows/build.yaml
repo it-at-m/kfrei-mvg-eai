@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-maven:
+  mvn-build:
     runs-on: ubuntu-latest
     permissions:
       # required to pull repository contents
@@ -32,15 +32,14 @@ jobs:
           distribution: temurin
           cache: maven
       
-      # Authenticate against GitHub Container Registry (ghcr.io)
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      
       # Build application, container image and publish it
       # Tags: branch name
       # - branch name
       # - commit SHA
       - name: Build with Maven (including image build & push)
+        env:
+          REGISTRY_USER: ${{ github.repository_owner }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           mvn -B -ntp clean package
           -Pcontainer

@@ -19,7 +19,7 @@ on:
         default: "0.0.0-SNAPSHOT"
 
 jobs:
-  release:
+  mvn-release:
     runs-on: ubuntu-latest
     permissions:
       # required to create commits and tags via Maven release plugin
@@ -50,16 +50,15 @@ jobs:
           java-version: 21
           distribution: temurin
       
-      # Authenticate against GitHub Container Registry (ghcr.io)
-      - name: Login to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      
       # Run the full Maven release lifecycle:
       # - update versions
       # - create Git tag
       # - build from the tagged commit
       # - build and publish the container image
       - name: Perform maven release (including image build & push)
+        env:
+          REGISTRY_USER: ${{ github.repository_owner }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           mvn -B -ntp release:prepare release:perform
           -DreleaseVersion=${{ github.event.inputs.release-version }} 
@@ -77,8 +76,8 @@ jobs:
           name: jar
           path: target/*.jar
 
-  publish:
-    needs: release
+  gh-release:
+    needs: mvn-release
     runs-on: ubuntu-latest
     permissions:
       # required to create the GitHub Release and upload assets
