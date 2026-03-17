@@ -49,10 +49,6 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
-          # For Maven Distribution Management
-          server-id: github
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
       
       # Run the full Maven release lifecycle:
       # - update versions
@@ -63,6 +59,9 @@ jobs:
         env:
           REGISTRY_USER: ${{ github.actor }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # For Maven Distribution Management
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           mvn -B -ntp release:prepare release:perform
           -DreleaseVersion=${{ github.event.inputs.release-version }} 
