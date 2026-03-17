@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.3</version>
-        <relativePath /> <!-- lookup parent from repository -->
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>de.muenchen.oss</groupId>
     <artifactId>kfrei-mvg-eai</artifactId>
@@ -82,7 +83,7 @@
             <artifactId>spring-boot-starter-restclient-test</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
 
         <!-- Utilities for development -->
         <dependency>
@@ -224,8 +225,8 @@
                         <eclipse>
                             <file>itm-java-codeformat/java_codestyle_formatter.xml</file>
                         </eclipse>
-                        <trimTrailingWhitespace />
-                        <endWithNewline />
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
                     </java>
                 </configuration>
                 <executions>
@@ -254,6 +255,7 @@
                                 <name>${image.name}:${image.tag.primary}</name>
                                 <!-- Ubuntu + Standard Linux Tools -->
                                 <builder>paketobuildpacks/builder-jammy-base</builder>
+                                <!-- Use fully qualified image tags to avoid fallback to docker.io -->
                                 <tags>
                                     <tag>${image.name}:${image.tag.sha}</tag>
                                 </tags>
