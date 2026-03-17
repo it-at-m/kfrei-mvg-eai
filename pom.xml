@@ -315,4 +315,11 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/it-at-m/kfrei-mvg-eai</url>
+        </repository>
+    </distributionManagement>
+
 </project>
