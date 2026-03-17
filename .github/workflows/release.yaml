@@ -64,10 +64,10 @@ jobs:
           -DreleaseVersion=${{ github.event.inputs.release-version }} 
           -DdevelopmentVersion=${{ github.event.inputs.development-version }} 
           -Dtag=v${{ github.event.inputs.release-version }} 
-          -Darguments="-DskipTests -Pcontainer,container-latest
-            -Dimage.name=ghcr.io/${{ github.repository }}
-            -Dimage.tag.primary=${{ github.event.inputs.release-version }}
-            -Dimage.tag.sha=${{ env.GITHUB_SHA_SHORT }}
+          -Darguments="-DskipTests -Pcontainer,container-latest \
+            -Dimage.name=ghcr.io/${{ github.repository }} \
+            -Dimage.tag.primary=${{ github.event.inputs.release-version }} \
+            -Dimage.tag.sha=${{ env.GITHUB_SHA_SHORT }}"
       
       # Upload built artifacts so they can be used in the publish job (different runner)
       - name: Upload build artifacts
