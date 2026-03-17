@@ -27,9 +27,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.security.OAuthFlow;
-import io.swagger.v3.oas.models.security.OAuthFlows;
-import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +49,7 @@ import org.springframework.context.annotation.Profile;
 )
 public class OpenApiConfiguration {
 
-    public static final String OAUTH2_SCHEME_NAME = "oAuth2ClientCredentials";
+    public static final String SCHEME_NAME = "bearer";
     public static final String DEFAULT_TOKEN_URL = "https://sso.example.com/auth/realms/example/protocol/openid-connect/token";
 
     @Bean
@@ -60,37 +57,33 @@ public class OpenApiConfiguration {
     public OpenAPI customOpenAPI(AppConfigurationProperties appConfiguration) {
         String tokenUrl = StringUtils.defaultIfBlank(appConfiguration.getSwaggerUi().getTokenUrl(), DEFAULT_TOKEN_URL);
 
-        SecurityScheme oauthScheme = new SecurityScheme()
-                .type(SecurityScheme.Type.OAUTH2)
+        SecurityScheme bearerScheme = new SecurityScheme()
+                .type(SecurityScheme.Type.HTTP)
+                .scheme(SCHEME_NAME)
+                .bearerFormat("JWT")
                 .description(
                         """
                                 This API requires an access token issued by the SSO system.  The token must be sent in the HTTP Authorization header:
 
                                     Authorization: Bearer <access_token>
 
-                                Example: obtain a token using client credentials
-
-                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" --data-urlencode "scope=openid roles"
-
-                                The token will include all client roles assigned to your application. Specific roles, such as [antragread], can be found in the token claim:
+                                The token will include all client roles assigned to your application. Specific roles (e.g. antragread) can be found in the token claim:
 
                                     resource_access.<client-name>.roles
 
-                                You can also test the API directly by filling in the following information and authenticating yourself.
+                                Obtain a token using client credentials
+
+                                    curl -X POST %s -H "Content-Type: application/x-www-form-urlencoded" -d "grant_type=client_credentials" -d "client_id=<client-id>" -d "client_secret=<client-secret>" --data-urlencode "scope=openid roles"
+
+                                Click the "Authorize" button in Swagger UI and paste the token.
                                 """
-                                .formatted(tokenUrl))
-                .flows(new OAuthFlows()
-                        .clientCredentials(new OAuthFlow()
-                                .tokenUrl(tokenUrl)
-                                .scopes(new Scopes()
-                                        .addString("openid", "OpenID Connect scope")
-                                        .addString("roles", "Include assigned client roles in the token"))));
+                                .formatted(tokenUrl));
 
         return new OpenAPI()
                 .components(new Components()
-                        .addSecuritySchemes(OAUTH2_SCHEME_NAME, oauthScheme))
+                        .addSecuritySchemes(SCHEME_NAME, bearerScheme))
                 .addSecurityItem(new SecurityRequirement()
-                        .addList(OAUTH2_SCHEME_NAME));
+                        .addList(SCHEME_NAME));
     }
 
 }
