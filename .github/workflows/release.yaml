@@ -61,7 +61,7 @@ jobs:
       # - build and publish the container image
       - name: Perform maven release (including image build & push)
         env:
-          REGISTRY_USER: ${{ github.repository_owner }}
+          REGISTRY_USER: ${{ github.actor }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           mvn -B -ntp release:prepare release:perform
