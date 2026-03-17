@@ -38,7 +38,7 @@ jobs:
       # - commit SHA
       - name: Build with Maven (including image build & push)
         env:
-          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_USER: ${{ github.repository_owner }}
           REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           mvn -B -ntp clean package
