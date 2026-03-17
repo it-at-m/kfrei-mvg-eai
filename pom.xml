@@ -9,7 +9,7 @@
     </parent>
     <groupId>de.muenchen.oss</groupId>
     <artifactId>kfrei-mvg-eai</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>kfrei-mvg-eai</name>
     <description>EAI component for communication between MVG (Münchner Verkehrsgesellschaft) and Kfrei (Kostenfreiheit des Schulwegs).</description>
     <properties>
