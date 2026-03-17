@@ -9,7 +9,7 @@
     </parent>
     <groupId>de.muenchen.oss</groupId>
     <artifactId>kfrei-mvg-eai</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>kfrei-mvg-eai</name>
     <description>EAI component for communication between MVG (Münchner Verkehrsgesellschaft) and Kfrei (Kostenfreiheit des Schulwegs).</description>
     <properties>
@@ -242,13 +242,7 @@
 
     <profiles>
         <profile>
-            <id>ci</id>
-            <properties>
-                <image.name>${env.IMAGE_NAME}</image.name>
-            </properties>
-        </profile>
-        <profile>
-            <id>build-image</id>
+            <id>container</id>
             <build>
                 <plugins>
                     <plugin>
@@ -256,32 +250,11 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <configuration>
                             <image>
-                                <name>${image.name}:${project.version}</name>
-                                <verboseLogging>true</verboseLogging>
-                                <tags>${env.IMAGE_TAGS}</tags>
-                            </image>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build-image</id>
-                                <goals>
-                                    <goal>build-image-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>publish</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
-                        <configuration>
-                            <image>
+                                <name>${image.name}:${image.tag.primary}</name>
+                                <tags>
+                                    <tag>${image.tag.sha}</tag>
+                                    <tag>${image.tag.optional}</tag>
+                                </tags>
                                 <publish>true</publish>
                             </image>
                             <docker>
@@ -291,6 +264,13 @@
                                 </publishRegistry>
                             </docker>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>build-image-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

@@ -1,6 +1,5 @@
 name: release
 
-# Run workflow on commits to the `main` branch
 on:
   workflow_dispatch:
     inputs:
@@ -8,99 +7,98 @@ on:
         description: "Branch to release from"
         required: true
         default: "main"
+
       release-version:
-        description: "Version for the release"
+        description: "Release version (e.g. 1.2.3)"
         required: true
-      release-tag:
-        description: "Tag for the release"
-        required: true
+        default: "0.0.0"
+
       development-version:
-        description: "Next development version"
+        description: "Next development version (e.g. 1.2.4-SNAPSHOT)"
         required: true
+        default: "0.0.0-SNAPSHOT"
+
       latest-image:
         description: "Tag image as 'latest'"
         required: true
-        default: true
+        default: "true"
 
 jobs:
-  prepare-release:
+  release:
     runs-on: ubuntu-latest
     permissions:
+      # required to create commits and tags via Maven release plugin
       contents: write
-    env:
-      BP_SPRING_CLOUD_BINDINGS_ENABLED: false
-      BPL_JVM_MEMORY_CALCULATOR_ENABLED: false
+      # required to push container images to ghcr.io
+      packages: write
+
     steps:
-      - name: Check out Git repository
+      # Checkout the selected branch with full history (required for Maven release)
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.inputs.branch }}
-      - name: Setup git user
+          fetch-depth: 0
+      
+      # Configure Git identity for commits created by the Maven release plugin
+      - name: Setup Git user
         uses: fregante/setup-git-user@v2
-      - name: Install Java and Maven
+      
+      # Install JDK (no Maven cache for clean, reproducible release builds)
+      - name: Setup Java 21
         uses: actions/setup-java@v5
         with:
           java-version: 21
-          distribution: "temurin"
-      - name: Perform maven release
+          distribution: temurin
+      
+      # Authenticate against GitHub Container Registry (ghcr.io)
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
+      # Run the full Maven release lifecycle:
+      # - update versions
+      # - create Git tag
+      # - build from the tagged commit
+      # - build and publish the container image
+      - name: Perform maven release (including image build & push)
         run: >
-          mvn -B -ntp release:prepare 
+          mvn -B -ntp release:prepare release:perform
           -DreleaseVersion=${{ github.event.inputs.release-version }} 
           -DdevelopmentVersion=${{ github.event.inputs.development-version }} 
-          -Dtag=${{ github.event.inputs.release-tag }} 
-          -Darguments="-DskipTests"
+          -Dtag=v${{ github.event.inputs.release-version }} 
+          -Darguments="-DskipTests -Pcontainer
+            -Dimage.name=ghcr.io/${{ github.repository }}
+            -Dimage.tag.primary=${{ github.event.inputs.release-version }}
+            -Dimage.tag.sha=${{ env.GITHUB_SHA_SHORT }}
+            ${{ github.event.inputs.latest-image == 'true' && '-Dimage.tag.optional=latest' || '' }}"
+      
+      # Upload built artifacts so they can be used in the publish job (different runner)
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: jar
+          path: target/*.jar
 
-  publish-image:
-    needs: prepare-release
+  publish:
+    needs: release
     runs-on: ubuntu-latest
     permissions:
-      packages: write
+      # required to create the GitHub Release and upload assets
       contents: write
+
     steps:
-      - name: checkout release tag
+      # Checkout the repository at the created release tag
+      - name: Checkout release tag
         uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.inputs.release-tag }}
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
-        with:
-          java-version: "21"
-          distribution: "temurin"
-          cache: "maven"
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          tags: |
-            type=raw,value=${{ github.event.inputs.release-version }}
-            ${{ inputs.latest-image && 'type=raw,value=latest' || '' }}
-      - name: Build image
-        env:
-          IMAGE_NAME: ghcr.io/${{ github.repository }}
-          IMAGE_RAW_TAGS: ${{ steps.meta.outputs.tags }}
-          REGISTRY_USER: ${{ github.repository_owner }}
-          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LATEST_TAG: ${{ github.event.inputs.latest-image }}
-        run: |
-          export IMAGE_TAGS="${IMAGE_RAW_TAGS//$'\n'/,}"
-          if [[ $LATEST_TAG = true ]]; then export IMAGE_TAGS=$IMAGE_TAGS,ghcr.io/it-at-m/kfrei-mvg-eai:latest; fi
-          mvn -B -ntp -DskipTests -P ci,build-image,publish verify
-  
-  github-release:
-    needs: ["publish-image"]
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: write
-    steps:
-      - name: Create GitHub Release
-        id: create_release
+          ref: v${{ github.event.inputs.release-version }}
+
+      # Create a GitHub Release and attach the built artifacts
+      - name: Publish (GitHub release + artifacts)
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            target/*.jar
-          tag_name: ${{ github.event.inputs.release-tag }}
+          tag_name: v${{ github.event.inputs.release-version }}
+          files: target/*.jar
           draft: false
           prerelease: false
           generate_release_notes: true
