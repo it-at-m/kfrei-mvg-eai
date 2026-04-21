@@ -50,6 +50,8 @@ You can expect the following behavior when using `KfreiRestApiServiceMock`:
 | GET         | antragId=2222222222, geburtsdatum=1989-02-28  | 200          | berechtigungAb=2025-02-28, befristungBis=2025-12-28 |                                                        |
 | GET         | antragId=3333333333, geburtsdatum=1989-09-30  | 200          | berechtigungAb=2026-01-30, befristungBis=2026-12-31 |                                                        |
 | GET         | antragId=4444444444, geburtsdatum=1989-10-31  | 200          | berechtigungAb=2027-01-30, befristungBis=2027-12-31 |                                                        |
+| GET         | antragId=5555555555, geburtsdatum=1989-12-24  | 200          | berechtigungAb=2027-09-15, befristungBis=2027-09-12 |                                                        |
+| GET         | antragId=6666666666, geburtsdatum=1989-12-25  | 200          | berechtigungAb=2026-09-01, befristungBis=2030-12-31 |                                                        |
 | GET         |                                               | 404          | none                                                | Any other combination of `antragId` and `geburtsdatum` |
 | GET         | antragId=1111111111, geburtsdatum=d1989-11-30 | 400          | Invalid argument [propertyName=geburtsdatum]        | Wrong format in `geburtsdatum`                         |
 | GET         | antragId=0                                    | 500          | none                                                | Simulates Internal Server Error in backend application |
