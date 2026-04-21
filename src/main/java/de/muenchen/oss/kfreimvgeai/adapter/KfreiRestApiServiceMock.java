@@ -80,6 +80,13 @@ public class KfreiRestApiServiceMock implements KfreiRestApiServiceI {
         if (antragId == 4444444444L && geburtsdatum.isEqual(LocalDate.of(1989, 10, 31))) {
             return new KfreiResponseDto(LocalDate.of(2027, 1, 30), LocalDate.of(2027, 12, 31));
         }
+        // Sonstige
+        if (antragId == 5555555555L && geburtsdatum.isEqual(LocalDate.of(1989, 12, 24))) {
+            return new KfreiResponseDto(LocalDate.of(2027, 9, 15), LocalDate.of(2027, 9, 12));
+        }
+        if (antragId == 6666666666L && geburtsdatum.isEqual(LocalDate.of(1989, 12, 25))) {
+            return new KfreiResponseDto(LocalDate.of(2026, 9, 1), LocalDate.of(2030, 12, 31));
+        }
 
         return null;
     }

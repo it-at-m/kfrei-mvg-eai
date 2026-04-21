@@ -27,15 +27,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.server.resource.authentication.ExpressionJwtGrantedAuthoritiesConverter;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Default security configuration for setting up filter chains in Spring.
@@ -76,15 +79,32 @@ public class DefaultSecurityConfiguration {
      */
     private JwtAuthenticationConverter jwtAuthenticationConverter(AppConfigurationProperties appConfiguration) {
         String clientId = appConfiguration.getResourceserver().getClientId();
-        String format = "['resource_access']['%s']['roles']".formatted(clientId);
-
-        Expression expression = new SpelExpressionParser().parseExpression(format);
-
-        ExpressionJwtGrantedAuthoritiesConverter authoritiesConverter = new ExpressionJwtGrantedAuthoritiesConverter(expression);
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
 
         JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-        jwtConverter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+
+        jwtConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            Object resourceAccessObject = jwt.getClaim("resource_access");
+
+            if (!(resourceAccessObject instanceof Map<?, ?> resourceAccess)) {
+                return Collections.emptyList();
+            }
+
+            Object clientObject = resourceAccess.get(clientId);
+            if (!(clientObject instanceof Map<?, ?> client)) {
+                return Collections.emptyList();
+            }
+
+            Object rolesObject = client.get("roles");
+            if (!(rolesObject instanceof Collection<?> roles)) {
+                return Collections.emptyList();
+            }
+
+            return roles.stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .collect(Collectors.toList());
+        });
 
         return jwtConverter;
     }
