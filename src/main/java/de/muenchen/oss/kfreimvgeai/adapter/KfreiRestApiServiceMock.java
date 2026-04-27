@@ -82,10 +82,25 @@ public class KfreiRestApiServiceMock implements KfreiRestApiServiceI {
         }
         // Sonstige
         if (antragId == 5555555555L && geburtsdatum.isEqual(LocalDate.of(1989, 12, 24))) {
-            return new KfreiResponseDto(LocalDate.of(2027, 9, 15), LocalDate.of(2027, 9, 12));
+            return new KfreiResponseDto(LocalDate.of(2026, 9, 15), LocalDate.of(2027, 9, 12));
         }
         if (antragId == 6666666666L && geburtsdatum.isEqual(LocalDate.of(1989, 12, 25))) {
             return new KfreiResponseDto(LocalDate.of(2026, 9, 1), LocalDate.of(2030, 12, 31));
+        }
+        if (antragId == 7777777777L && geburtsdatum.isEqual(LocalDate.of(2010, 8, 20))) {
+            return new KfreiResponseDto(LocalDate.of(2026, 9, 1), LocalDate.of(2030, 12, 31));
+        }
+        if (antragId == 8888888888L && geburtsdatum.isEqual(LocalDate.of(2015, 4, 1))) {
+            return new KfreiResponseDto(LocalDate.of(2025, 9, 1), LocalDate.of(2030, 12, 31));
+        }
+        if (antragId == 9999999999L && geburtsdatum.isEqual(LocalDate.of(2011, 4, 1))) {
+            return new KfreiResponseDto(LocalDate.of(2025, 9, 1), null);
+        }
+        if (antragId == 9999999991L && geburtsdatum.isEqual(LocalDate.of(2011, 4, 1))) {
+            return new KfreiResponseDto(null, LocalDate.of(2030, 12, 31));
+        }
+        if (antragId == 9999999992L && geburtsdatum.isEqual(LocalDate.of(2011, 4, 1))) {
+            return new KfreiResponseDto(null, null);
         }
 
         return null;
