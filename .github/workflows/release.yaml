@@ -41,7 +41,7 @@ jobs:
       
       # Configure Git identity for commits created by the Maven release plugin
       - name: Setup Git user
-        uses: fregante/setup-git-user@v2
+        uses: fregante/setup-git-user@024bc0b8e177d7e77203b48dab6fb45666854b35 # v2.0.2
       
       # Install JDK (no Maven cache for clean, reproducible release builds)
       - name: Setup Java 21
