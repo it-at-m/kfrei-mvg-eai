@@ -30,7 +30,7 @@ jobs:
     steps:
       # Generate safe slug values for branch names (Docker-compatible)
       - name: Generate slug variables
-        uses: rlespinasse/github-slug-action@v5
+        uses: rlespinasse/github-slug-action@e6f261660910b273384c5c42b17a0217881b217a # v5.6.0
       
       # Checkout the selected branch with full history (required for Maven release)
       - name: Checkout repository
