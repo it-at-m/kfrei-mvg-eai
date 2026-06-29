@@ -34,7 +34,7 @@ jobs:
       
       # Checkout the selected branch with full history (required for Maven release)
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: ${{ github.event.inputs.branch }}
           fetch-depth: 0
@@ -89,7 +89,7 @@ jobs:
     steps:
       # Checkout the repository at the created release tag
       - name: Checkout release tag
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           ref: v${{ github.event.inputs.release-version }}
 
