@@ -81,9 +81,9 @@ public class AntragController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = MvgResponseDto.class),
                     examples = @ExampleObject(
-                            """
-                                    { "berechtigungAb": "2025-12-24", "befristungBis": "2026-12-01" }
-                                    """
+                        """
+                                { "berechtigungAb": "2025-12-24", "befristungBis": "2026-12-01" }
+                                """
                     )
             )
     )
