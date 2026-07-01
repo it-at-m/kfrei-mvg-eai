@@ -33,7 +33,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -75,41 +74,37 @@ public class AntragController {
             description = "Verifies that an Antrag with given information exists",
             security = @SecurityRequirement(name = OpenApiConfiguration.SCHEME_NAME)
     )
-    @ApiResponses(
-        {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "Antrag exists",
-                        content = @Content(
-                                mediaType = "application/json",
-                                schema = @Schema(implementation = MvgResponseDto.class),
-                                examples = @ExampleObject(
+    @ApiResponse(
+            responseCode = "200",
+            description = "Antrag exists",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MvgResponseDto.class),
+                    examples = @ExampleObject(
+                            """
+                                    { "berechtigungAb": "2025-12-24", "befristungBis": "2026-12-01" }
                                     """
-                                            { "berechtigungAb": "2025-12-24", "befristungBis": "2026-12-01" }
-                                            """
-                                )
-                        )
-                ),
-                @ApiResponse(
-                        responseCode = "400",
-                        description = "Bad Request",
-                        content = @Content(
-                                mediaType = "text/plain",
-                                schema = @Schema(type = "string"),
-                                examples = @ExampleObject("Invalid argument [propertyName=%s]")
-                        )
-                ),
-                @ApiResponse(
-                        responseCode = "404",
-                        description = "Antrag does not exist",
-                        content = @Content
-                ),
-                @ApiResponse(
-                        responseCode = "500",
-                        description = "Processing error occurred",
-                        content = @Content
-                )
-        }
+                    )
+            )
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Bad Request",
+            content = @Content(
+                    mediaType = "text/plain",
+                    schema = @Schema(type = "string"),
+                    examples = @ExampleObject("Invalid argument [propertyName=%s]")
+            )
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "Antrag does not exist",
+            content = @Content
+    )
+    @ApiResponse(
+            responseCode = "500",
+            description = "Processing error occurred",
+            content = @Content
     )
     @PreAuthorize("hasRole('" + KfreiMvgEaiRoles.ANTRAG_READ + "')")
     public ResponseEntity<MvgResponseDto> existsAntrag(
