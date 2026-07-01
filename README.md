@@ -9,7 +9,7 @@ EAI component for communication between MVG (Münchner Verkehrsgesellschaft) and
 
 The documentation project is built with technologies we use in our projects:
 
-* Java 21
+* Java 25
 * Spring Boot 4
 * Maven - Build Tool
 * MapStruct - For object mapping
